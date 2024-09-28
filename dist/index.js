@@ -378,7 +378,10 @@ class VscodeDemo extends HTMLElement {
       this._onToggleFullscreenButtonClick
     );
 
-    applyTheme("light");
+    const defaultTheme = /** @type {ThemeId} */ (Object.keys(themeInfo)[0]);
+
+    applyTheme(defaultTheme);
+    setActiveDemoTabs(defaultTheme);
   }
 
   disconnectedCallback() {
