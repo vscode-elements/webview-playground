@@ -1,0 +1,16 @@
+{
+  "name": "vscode-webview-playground",
+  "version": "1.0.0",
+  "description": "A web component to provide styles available in VSCode Webview.",
+  "main": "index.js",
+  "module": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "serve"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}
