@@ -124,6 +124,74 @@ async function fetchTheme(themeId) {
   return theme;
 }
 
+/**
+ * @param {ThemeId} theme
+ */
+function setActiveDemoTabs(theme) {
+  const instanceKeys = Object.keys(themeSelectorInstances);
+
+  instanceKeys.forEach((k) => {
+    themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
+      b.classList.toggle("active", b.value === theme);
+    });
+  });
+}
+
+/**
+ * @param {boolean} disabled
+ */
+function setAllDemoTabsDisabled(disabled) {
+  const instanceKeys = Object.keys(themeSelectorInstances);
+
+  instanceKeys.forEach((k) => {
+    themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
+      b.disabled = disabled;
+    });
+  });
+}
+
+/**
+ * @param {ThemeId} themeId
+ */
+async function applyTheme(themeId) {
+  if (themeId === appliedTheme) {
+    return;
+  }
+
+  appliedTheme = themeId;
+
+  const themeKeys = Object.keys(themeInfo);
+  const themeKindClasses = [];
+  const kind = themeInfo[themeId].themeKind;
+
+  themeKeys.forEach((t) => {
+    themeKindClasses.push(...themeInfo[t].themeKind);
+  });
+
+  const uniqThemeKindClasses = [...new Set(themeKindClasses)];
+
+  document.body.classList.remove(...uniqThemeKindClasses);
+  document.body.classList.add(`vscode-${themeInfo[themeId].themeKind}`);
+  document.body.dataset.vscodeThemeKind = `vscode-${kind}`;
+
+  themes[themeId] = themes[themeId] || {};
+
+  if (themes[themeId].data) {
+    document.documentElement.setAttribute("style", themes[themeId].data);
+    return;
+  }
+
+  if (!themes[themeId].isFetching) {
+    themes[themeId].isFetching = true;
+
+    const theme = await fetchTheme(themeId);
+
+    themes[themeId].isFetching = false;
+    themes[themeId].data = theme;
+    document.documentElement.setAttribute("style", themes[themeId].data);
+  }
+}
+
 class VscodeDevToolbar extends HTMLElement {}
 
 const demoTemplate = document.createElement("template");
@@ -310,7 +378,7 @@ class VscodeDemo extends HTMLElement {
       this._onToggleFullscreenButtonClick
     );
 
-    this._applyTheme("light");
+    applyTheme("light");
   }
 
   disconnectedCallback() {
@@ -330,11 +398,11 @@ class VscodeDemo extends HTMLElement {
     const bt = /** @type {HTMLButtonElement} */ (ev.target);
     const value = /** @type {ThemeId} */ (bt.value);
 
-    this._setActiveTabs(value);
-    this._setAllTabsDisabled(true);
+    setActiveDemoTabs(value);
+    setAllDemoTabsDisabled(true);
 
-    this._applyTheme(value).then(() => {
-      this._setAllTabsDisabled(false);
+    applyTheme(value).then(() => {
+      setAllDemoTabsDisabled(false);
     });
   };
 
@@ -345,74 +413,6 @@ class VscodeDemo extends HTMLElement {
       this.removeAttribute("fullscreen");
     }
   };
-
-  /**
-   * @param {ThemeId} theme
-   */
-  _setActiveTabs(theme) {
-    const instanceKeys = Object.keys(themeSelectorInstances);
-
-    instanceKeys.forEach((k) => {
-      themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
-        b.classList.toggle("active", b.value === theme);
-      });
-    });
-  }
-
-  /**
-   * @param {boolean} disabled
-   */
-  _setAllTabsDisabled(disabled) {
-    const instanceKeys = Object.keys(themeSelectorInstances);
-
-    instanceKeys.forEach((k) => {
-      themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
-        b.disabled = disabled;
-      });
-    });
-  }
-
-  /**
-   * @param {ThemeId} themeId
-   */
-  async _applyTheme(themeId) {
-    if (themeId === appliedTheme) {
-      return;
-    }
-
-    appliedTheme = themeId;
-
-    const themeKeys = Object.keys(themeInfo);
-    const themeKindClasses = [];
-    const kind = themeInfo[themeId].themeKind;
-
-    themeKeys.forEach((t) => {
-      themeKindClasses.push(...themeInfo[t].themeKind);
-    });
-
-    const uniqThemeKindClasses = [...new Set(themeKindClasses)];
-
-    document.body.classList.remove(...uniqThemeKindClasses);
-    document.body.classList.add(`vscode-${themeInfo[themeId].themeKind}`);
-    document.body.dataset.vscodeThemeKind = `vscode-${kind}`;
-
-    themes[themeId] = themes[themeId] || {};
-
-    if (themes[themeId].data) {
-      document.documentElement.setAttribute("style", themes[themeId].data);
-      return;
-    }
-
-    if (!themes[themeId].isFetching) {
-      themes[themeId].isFetching = true;
-
-      const theme = await fetchTheme(themeId);
-
-      themes[themeId].isFetching = false;
-      themes[themeId].data = theme;
-      document.documentElement.setAttribute("style", themes[themeId].data);
-    }
-  }
 }
 
 customElements.define("vscode-dev-toolbar", VscodeDevToolbar);
