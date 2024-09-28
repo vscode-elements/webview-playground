@@ -1,3 +1,5 @@
+// @ts-check
+
 const logoSVG = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 167.435 73.998">
     <g fill="#007acc">
@@ -7,11 +9,96 @@ const logoSVG = `
   </svg>`;
 
 /** Calculated url of the script directory base on the `import.meta` property. */
+// TODO: Use import.meta.resolve()
 let directoryUrl;
 /** Demo component instance counter */
 let instanceCounter = 0;
+/** @type {{[key: string]: HTMLDivElement | null}} */
 const themeSelectorInstances = {};
-const themes = {};
+/**
+ * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
+ * @typedef {Record<ThemeId, {data?: string; isFetching?: boolean;}>} ThemeRegistry
+ */
+/**
+ * @type {ThemeRegistry}
+ */
+const themes = {
+  light: {},
+  "light-v2": {},
+  dark: {},
+  "dark-v2": {},
+  "hc-light": {},
+  "hc-dark": {},
+};
+
+/**
+ * @typedef  ThemeInfoItem
+ * @type {object}
+ * @property {string[]} themeKind - Theme kind.
+ * @property {string} name - Theme short name.
+ * @property {string=} longName - Detailed name of theme.
+ * @property {string} label - Theme switcher button label.
+ * @property {string} description - Theme description.
+ *
+ * @typedef {Record<ThemeId, ThemeInfoItem>} ThemeInfo
+ */
+
+/** @type {ThemeInfo} */
+const themeInfo = {
+  light: {
+    themeKind: ["vscode-light"],
+    name: "Light+",
+    longName: "Default Light+",
+    label: "Light",
+    description: "Default light theme before April 2023 (version 1.78)",
+  },
+  "light-v2": {
+    themeKind: ["vscode-light"],
+    name: "Light Modern",
+    longName: "Default Light Modern",
+    label: "Light v2",
+    description: "Default light theme since April 2023 (version 1.78)",
+  },
+  dark: {
+    themeKind: ["vscode-dark"],
+    name: "Dark+",
+    longName: "Default Dark+",
+    label: "Dark",
+    description: "Default dark theme before April 2023 (version 1.78)",
+  },
+  "dark-v2": {
+    themeKind: ["vscode-dark"],
+    name: "Dark Modern",
+    longName: "Default Dark Modern",
+    label: "Dark v2",
+    description: "Default dark theme since April 2023 (version 1.78)",
+  },
+  "hc-light": {
+    themeKind: ["vscode-high-contrast-light", "vscode-high-contrast"],
+    name: "Light High Contrast",
+    longName: "Default High Contrast Light",
+    label: "HC Light",
+    description: "Light High Contrast theme",
+  },
+  "hc-dark": {
+    themeKind: ["vscode-high-contrast"],
+    name: "Dark High Contrast",
+    longName: "Default High Contrast",
+    label: "HC Dark",
+    description: "Dark High Contrast theme",
+  },
+};
+
+function getTabHeadersHTML() {
+  const keys = Object.keys(themeInfo);
+
+  return keys.reduce((previousValue, _currentValue, i, arr) => {
+    const title = themeInfo[arr[i]].description;
+    const label = themeInfo[arr[i]].label;
+
+    return `${previousValue}<button title="${title}" value="${arr[i]}" class="theme-button">${label}</button>`;
+  }, "");
+}
 
 function getDirectoryUrl() {
   if (directoryUrl) {
@@ -25,8 +112,11 @@ function getDirectoryUrl() {
   return directoryUrl;
 }
 
-async function fetchTheme(themeName) {
-  const res = await fetch(`${getDirectoryUrl()}/${themeName}.txt`);
+/**
+ * @param {ThemeId} themeId
+ */
+async function fetchTheme(themeId) {
+  const res = await fetch(`${getDirectoryUrl()}/${themeId}.txt`);
   const theme = await res.text();
 
   return theme;
@@ -35,7 +125,6 @@ async function fetchTheme(themeName) {
 class VscodeDevToolbar extends HTMLElement {}
 
 const demoTemplate = document.createElement("template");
-
 demoTemplate.innerHTML = `
   <style>
     :host {
@@ -114,6 +203,10 @@ demoTemplate.innerHTML = `
       padding: 10px 15px 7px;
     }
 
+    .theme-selector button.theme-button:disabled {
+      opacity: 0.5;
+    }
+
     .theme-selector button.theme-button.active {
       border-bottom-color: var(--toolbar-active, #007acc);
       color:  var(--toolbar-active, #007acc);
@@ -165,12 +258,7 @@ demoTemplate.innerHTML = `
   </style>
   <div class="theme-selector-wrapper">
     <div id="theme-selector" class="theme-selector">
-      <button type="button" value="light" data-theme-kind="light" class="theme-button active"><span>Light</span></button>
-      <button type="button" value="light-v2" data-theme-kind="light" class="theme-button"><span>Light V2</span></button>
-      <button type="button" value="dark" data-theme-kind="dark" class="theme-button"><span>Dark</span></button>
-      <button type="button" value="dark-v2" data-theme-kind="dark" class="theme-button"><span>Dark V2</span></button>
-      <button type="button" value="hc-light" data-theme-kind="high-contrast-light" class="theme-button"><span>HC Light</span></button>
-      <button type="button" value="hc-dark" data-theme-kind="high-contrast" class="theme-button"><span>HC Dark</span></button>
+      ${getTabHeadersHTML()}
       <button type="button" class="toggle-fullscreen-button" id="toggle-fullscreen" title="toggle fullscreen">
         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="full">
           <path d="M3 12h10V4H3v8zm2-6h6v4H5V6zM2 6H1V2.5l.5-.5H5v1H2v3zm13-3.5V6h-1V3h-3V2h3.5l.5.5zM14 10h1v3.5l-.5.5H11v-1h3v-3zM2 13h3v1H1.5l-.5-.5V10h1v3z"/>
@@ -187,6 +275,13 @@ demoTemplate.innerHTML = `
 `;
 
 class VscodeDemo extends HTMLElement {
+  /** @type {HTMLDivElement | null} */
+  _elThemeSelector = null;
+  /** @type {NodeListOf<HTMLButtonElement> | null} */
+  _elButtons = null;
+  /** @type {HTMLButtonElement | null} */
+  _elToggleFullscreen = null;
+
   constructor() {
     super();
 
@@ -194,12 +289,12 @@ class VscodeDemo extends HTMLElement {
     shadowRoot.appendChild(demoTemplate.content.cloneNode(true));
 
     this._elThemeSelector = shadowRoot.querySelector(".theme-selector");
-    this._elButtons = this._elThemeSelector.querySelectorAll(
+    this._elButtons = this._elThemeSelector?.querySelectorAll(
       "button.theme-button"
-    );
-    this._elToggleFullscreen = this._elThemeSelector.querySelector(
+    ) ?? null;
+    this._elToggleFullscreen = this._elThemeSelector?.querySelector(
       ".toggle-fullscreen-button"
-    );
+    ) ?? null;
   }
 
   connectedCallback() {
@@ -207,37 +302,39 @@ class VscodeDemo extends HTMLElement {
     themeSelectorInstances[`instance-${instanceCounter}`] =
       this._elThemeSelector;
 
-    this._elButtons.forEach((b) => {
+    this._elButtons?.forEach((b) => {
       b.addEventListener("click", this._onThemeSelectorButtonClick);
     });
-    this._elToggleFullscreen.addEventListener(
+    this._elToggleFullscreen?.addEventListener(
       "click",
       this._onToggleFullscreenButtonClick
     );
 
-    this._applyTheme("light", "light");
+    this._applyTheme("light");
   }
 
   disconnectedCallback() {
-    this._elButtons.forEach((b) => {
+    this._elButtons?.forEach((b) => {
       b.removeEventListener("click", this._onThemeSelectorButtonClick);
     });
-    this._elToggleFullscreen.removeEventListener(
+    this._elToggleFullscreen?.removeEventListener(
       "click",
       this._onToggleFullscreenButtonClick
     );
   }
 
+  /**
+   * @param {MouseEvent} ev 
+   */
   _onThemeSelectorButtonClick = (ev) => {
-    const bt = ev.target;
-    const value = bt.value;
-    const kind = bt.dataset.themeKind;
+    const bt = /** @type {HTMLButtonElement} */(ev.target);
+    const value = /** @type {ThemeId} */(bt.value);
 
-    this._runOperationOnEachThemeSelector("setValue", value);
-    this._runOperationOnEachThemeSelector("disable");
+    this._setActiveTabs(value);
+    this._setAllTabsDisabled(true);
 
-    this._applyTheme(value, kind).then(() => {
-      this._runOperationOnEachThemeSelector("enable");
+    this._applyTheme(value).then(() => {
+      this._setAllTabsDisabled(false);
     });
   };
 
@@ -249,45 +346,54 @@ class VscodeDemo extends HTMLElement {
     }
   };
 
-  _runOperationOnEachThemeSelector(command, ...args) {
+  /**
+   * @param {ThemeId} theme
+   */
+  _setActiveTabs(theme) {
     const instanceKeys = Object.keys(themeSelectorInstances);
 
     instanceKeys.forEach((k) => {
-      switch (command) {
-        case "enable":
-          themeSelectorInstances[k].querySelectorAll("button").forEach((b) => {
-            b.disabled = false;
-          });
-          break;
-        case "disable":
-          themeSelectorInstances[k].querySelectorAll("button").forEach((b) => {
-            b.disabled = true;
-          });
-          break;
-        case "setValue":
-          themeSelectorInstances[k].querySelectorAll("button").forEach((b) => {
-            b.classList.toggle("active", b.value === args[0]);
-          });
-          break;
-        default:
-      }
+      themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
+        b.classList.toggle("active", b.value === theme);
+      });
     });
   }
 
-  async _applyTheme(themeName, kind) {
-    document.body.classList.remove(
-      "vscode-light",
-      "vscode-dark",
-      "vscode-high-contrast",
-      "vscode-high-contrast-light"
-    );
-    document.body.classList.add(`vscode-${kind}`);
+  /**
+   * @param {boolean} disabled
+   */
+  _setAllTabsDisabled(disabled) {
+    const instanceKeys = Object.keys(themeSelectorInstances);
+
+    instanceKeys.forEach((k) => {
+      themeSelectorInstances[k]?.querySelectorAll("button").forEach((b) => {
+        b.disabled = disabled;
+      });
+    });
+  }
+
+  /**
+   * @param {ThemeId} themeName
+   */
+  async _applyTheme(themeName) {
+    const themeKeys = Object.keys(themeInfo);
+    const themeKindClasses = [];
+    const kind = themeInfo[themeName].themeKind;
+
+    themeKeys.forEach((t) => {
+      themeKindClasses.push(...themeInfo[t].themeKind);
+    });
+
+    const uniqThemeKindClasses = [...new Set(themeKindClasses)];
+
+    document.body.classList.remove(...uniqThemeKindClasses);
+    document.body.classList.add(`vscode-${themeInfo[themeName].themeKind}`);
     document.body.dataset.vscodeThemeKind = `vscode-${kind}`;
 
     themes[themeName] = themes[themeName] || {};
 
     if (themes[themeName].data) {
-      document.documentElement.style = themes[themeName].data;
+      document.documentElement.setAttribute("style", themes[themeName].data);
       return;
     }
 
@@ -298,7 +404,7 @@ class VscodeDemo extends HTMLElement {
 
       themes[themeName].isFetching = false;
       themes[themeName].data = theme;
-      document.documentElement.style = themes[themeName].data;
+      document.documentElement.setAttribute("style", themes[themeName].data);
     }
   }
 }

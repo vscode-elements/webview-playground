@@ -22,6 +22,14 @@
       white-space: nowrap;
     }
 
+    .badge.counter {
+      border-radius: 11px;
+      box-sizing: border-box;
+      height: 18px;
+      line-height: 1;
+      padding: 3px 5px;
+    }
+
     .badge.activity-bar-counter {
       background-color: var(--vscode-activityBarBadge-background);
       border-radius: 20px;
@@ -35,6 +43,12 @@
   <script type="module" src="/dist/index.js"></script>
 </head>
 <body>
+  <vscode-demo>
+    <span class="badge">308 Settings Found</span>
+  </vscode-demo>
+  <vscode-demo>
+    <span class="badge counter">42</span>
+  </vscode-demo>
   <vscode-demo>
     <span class="badge activity-bar-counter">42</span>
   </vscode-demo>
