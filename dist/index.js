@@ -6,7 +6,9 @@ const logoSVG = `
     </g>
   </svg>`;
 
+/** Calculated url of the script directory base on the `import.meta` property. */
 let directoryUrl;
+/** Demo component instance counter */
 let instanceCounter = 0;
 const themeSelectorInstances = {};
 const themes = {};
@@ -169,7 +171,6 @@ demoTemplate.innerHTML = `
       <button type="button" value="dark-v2" data-theme-kind="dark" class="theme-button"><span>Dark V2</span></button>
       <button type="button" value="hc-light" data-theme-kind="high-contrast-light" class="theme-button"><span>HC Light</span></button>
       <button type="button" value="hc-dark" data-theme-kind="high-contrast" class="theme-button"><span>HC Dark</span></button>
-      <button type="button" value="fallback" data-theme-kind="light" class="theme-button"><span>Unstyled</span></button>
       <button type="button" class="toggle-fullscreen-button" id="toggle-fullscreen" title="toggle fullscreen">
         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="full">
           <path d="M3 12h10V4H3v8zm2-6h6v4H5V6zM2 6H1V2.5l.5-.5H5v1H2v3zm13-3.5V6h-1V3h-3V2h3.5l.5.5zM14 10h1v3.5l-.5.5H11v-1h3v-3zM2 13h3v1H1.5l-.5-.5V10h1v3z"/>
@@ -199,28 +200,35 @@ class VscodeDemo extends HTMLElement {
     this._elToggleFullscreen = this._elThemeSelector.querySelector(
       ".toggle-fullscreen-button"
     );
+  }
 
+  connectedCallback() {
     instanceCounter++;
     themeSelectorInstances[`instance-${instanceCounter}`] =
       this._elThemeSelector;
 
-    this._onThemeSelectorButtonClickBound =
-      this._onThemeSelectorButtonClick.bind(this);
-    this._onToggleFullscreenButtonClickBound =
-      this._onToggleFullscreenButtonClick.bind(this);
-
     this._elButtons.forEach((b) => {
-      b.addEventListener("click", this._onThemeSelectorButtonClickBound);
+      b.addEventListener("click", this._onThemeSelectorButtonClick);
     });
     this._elToggleFullscreen.addEventListener(
       "click",
-      this._onToggleFullscreenButtonClickBound
+      this._onToggleFullscreenButtonClick
     );
 
     this._applyTheme("light", "light");
   }
 
-  _onThemeSelectorButtonClick(ev) {
+  disconnectedCallback() {
+    this._elButtons.forEach((b) => {
+      b.removeEventListener("click", this._onThemeSelectorButtonClick);
+    });
+    this._elToggleFullscreen.removeEventListener(
+      "click",
+      this._onToggleFullscreenButtonClick
+    );
+  }
+
+  _onThemeSelectorButtonClick = (ev) => {
     const bt = ev.target;
     const value = bt.value;
     const kind = bt.dataset.themeKind;
@@ -231,15 +239,15 @@ class VscodeDemo extends HTMLElement {
     this._applyTheme(value, kind).then(() => {
       this._runOperationOnEachThemeSelector("enable");
     });
-  }
+  };
 
-  _onToggleFullscreenButtonClick() {
+  _onToggleFullscreenButtonClick = () => {
     if (!this.hasAttribute("fullscreen")) {
       this.setAttribute("fullscreen", "");
     } else {
       this.removeAttribute("fullscreen");
     }
-  }
+  };
 
   _runOperationOnEachThemeSelector(command, ...args) {
     const instanceKeys = Object.keys(themeSelectorInstances);
