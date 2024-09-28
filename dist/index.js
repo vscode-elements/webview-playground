@@ -8,6 +8,8 @@ const logoSVG = `
     </g>
   </svg>`;
 
+/** @type {ThemeId} */
+let appliedTheme;
 /** Calculated url of the script directory base on the `import.meta` property. */
 // TODO: Use import.meta.resolve()
 let directoryUrl;
@@ -289,12 +291,10 @@ class VscodeDemo extends HTMLElement {
     shadowRoot.appendChild(demoTemplate.content.cloneNode(true));
 
     this._elThemeSelector = shadowRoot.querySelector(".theme-selector");
-    this._elButtons = this._elThemeSelector?.querySelectorAll(
-      "button.theme-button"
-    ) ?? null;
-    this._elToggleFullscreen = this._elThemeSelector?.querySelector(
-      ".toggle-fullscreen-button"
-    ) ?? null;
+    this._elButtons =
+      this._elThemeSelector?.querySelectorAll("button.theme-button") ?? null;
+    this._elToggleFullscreen =
+      this._elThemeSelector?.querySelector(".toggle-fullscreen-button") ?? null;
   }
 
   connectedCallback() {
@@ -324,11 +324,11 @@ class VscodeDemo extends HTMLElement {
   }
 
   /**
-   * @param {MouseEvent} ev 
+   * @param {MouseEvent} ev
    */
   _onThemeSelectorButtonClick = (ev) => {
-    const bt = /** @type {HTMLButtonElement} */(ev.target);
-    const value = /** @type {ThemeId} */(bt.value);
+    const bt = /** @type {HTMLButtonElement} */ (ev.target);
+    const value = /** @type {ThemeId} */ (bt.value);
 
     this._setActiveTabs(value);
     this._setAllTabsDisabled(true);
@@ -373,12 +373,18 @@ class VscodeDemo extends HTMLElement {
   }
 
   /**
-   * @param {ThemeId} themeName
+   * @param {ThemeId} themeId
    */
-  async _applyTheme(themeName) {
+  async _applyTheme(themeId) {
+    if (themeId === appliedTheme) {
+      return;
+    }
+
+    appliedTheme = themeId;
+
     const themeKeys = Object.keys(themeInfo);
     const themeKindClasses = [];
-    const kind = themeInfo[themeName].themeKind;
+    const kind = themeInfo[themeId].themeKind;
 
     themeKeys.forEach((t) => {
       themeKindClasses.push(...themeInfo[t].themeKind);
@@ -387,24 +393,24 @@ class VscodeDemo extends HTMLElement {
     const uniqThemeKindClasses = [...new Set(themeKindClasses)];
 
     document.body.classList.remove(...uniqThemeKindClasses);
-    document.body.classList.add(`vscode-${themeInfo[themeName].themeKind}`);
+    document.body.classList.add(`vscode-${themeInfo[themeId].themeKind}`);
     document.body.dataset.vscodeThemeKind = `vscode-${kind}`;
 
-    themes[themeName] = themes[themeName] || {};
+    themes[themeId] = themes[themeId] || {};
 
-    if (themes[themeName].data) {
-      document.documentElement.setAttribute("style", themes[themeName].data);
+    if (themes[themeId].data) {
+      document.documentElement.setAttribute("style", themes[themeId].data);
       return;
     }
 
-    if (!themes[themeName].isFetching) {
-      themes[themeName].isFetching = true;
+    if (!themes[themeId].isFetching) {
+      themes[themeId].isFetching = true;
 
-      const theme = await fetchTheme(themeName);
+      const theme = await fetchTheme(themeId);
 
-      themes[themeName].isFetching = false;
-      themes[themeName].data = theme;
-      document.documentElement.setAttribute("style", themes[themeName].data);
+      themes[themeId].isFetching = false;
+      themes[themeId].data = theme;
+      document.documentElement.setAttribute("style", themes[themeId].data);
     }
   }
 }
