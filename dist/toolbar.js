@@ -9,6 +9,7 @@ import {
   setActiveDemoTabs,
   setActiveToolbarInstance,
   setAllDemoTabsDisabled,
+  STORAGE_KEY_SHOW_UI,
   STORAGE_KEY_THEME,
   themeInfo,
 } from "./shared.js";
@@ -16,11 +17,14 @@ import {
 /** @typedef {import("./shared.js").ThemeId} ThemeId */
 
 const DEFAULT_STYLES_ID = "_defaultStyles";
+const ATTR_SHOW_UI = "show-ui";
 
 const toolbarTemplate = document.createElement("template");
 toolbarTemplate.innerHTML = getToolbarTemplateHTML();
 
 export class VscodeDevToolbar extends HTMLElement {
+  static observedAttributes = [ATTR_SHOW_UI];
+
   constructor() {
     super();
 
@@ -72,6 +76,14 @@ export class VscodeDevToolbar extends HTMLElement {
       setActiveDemoTabs(initialTheme);
     });
     this._applyDefaultStyles();
+
+    const savedUiState = localStorage.getItem(STORAGE_KEY_SHOW_UI);
+
+    if (savedUiState === null) {
+      this._showUi(true);
+    } else {
+      this._showUi(savedUiState === "true");
+    }
   }
 
   disconnectedCallback() {
@@ -89,11 +101,53 @@ export class VscodeDevToolbar extends HTMLElement {
     );
   }
 
+  /**
+   *
+   * @param {string} name
+   * @param {string} oldValue
+   * @param {string} newValue
+   */
+  attributeChangedCallback(name, oldValue, newValue) {
+    console.log(name, oldValue, newValue, this.hasAttribute(ATTR_SHOW_UI));
+    if (name === ATTR_SHOW_UI) {
+      this._showUi(this.hasAttribute(ATTR_SHOW_UI));
+    }
+  }
+
   /** @param {ThemeId} value */
   setThemeSelector(value) {
     if (this._themeSelector) {
       this._themeSelector.value = value;
     }
+  }
+
+  /** @param {boolean} force */
+  set showUi(force) {
+    if (Boolean(force)) {
+      this.setAttribute(ATTR_SHOW_UI, "");
+    } else {
+      this.removeAttribute(ATTR_SHOW_UI);
+    }
+
+    this._showUi(Boolean(force));
+  }
+
+  /** @returns {boolean} */
+  get showUi() {
+    return this.hasAttribute(ATTR_SHOW_UI);
+  }
+
+  /** @param {boolean} force */
+  _showUi(force) {
+    const ui = this.shadowRoot?.querySelector(".ui");
+
+    if (force) {
+      ui?.classList.add("show");
+    } else {
+      ui?.classList.remove("show");
+    }
+
+    localStorage.setItem(STORAGE_KEY_SHOW_UI, force.toString());
   }
 
   _applyDefaultStyles() {

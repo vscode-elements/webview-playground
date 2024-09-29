@@ -23,6 +23,7 @@ export const STORAGE_KEY_PREFIX = "vscode-webview-playground";
 export const STORAGE_KEY_THEME = `${STORAGE_KEY_PREFIX}_theme`;
 export const STORAGE_KEY_UNDERLINE_LINKS = `${STORAGE_KEY_PREFIX}_underline-links`;
 export const STORAGE_KEY_REDUCE_MOTION = `${STORAGE_KEY_PREFIX}_reduce-motion`;
+export const STORAGE_KEY_SHOW_UI = `${STORAGE_KEY_PREFIX}_show-ui`;
 export const TOOLBAR_TAG_NAME = "vscode-dev-toolbar";
 export const DEMO_TAG_NAME = "vscode-demo";
 
@@ -362,6 +363,14 @@ export function getToolbarTemplateHTML() {
         right: 30px;
       }
 
+      .ui {
+        display: none;
+      }
+
+      .ui.show {
+        display: block;
+      }
+
       label {
         user-select: none;
       }
@@ -457,7 +466,7 @@ export function getToolbarTemplateHTML() {
         display: block;
       }
     </style>
-    <div>
+    <div class="ui">
       <button type="button" title="Open toolbar" class="open-toolbar-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
