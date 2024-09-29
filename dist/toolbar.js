@@ -1,15 +1,15 @@
 // @ts-check
 
 import {
+  activeToolbarInstance,
   applyTheme,
   getInitialTheme,
   getToolbarTemplateHTML,
   setActiveDemoTabs,
+  setActiveToolbarInstance,
   setAllDemoTabsDisabled,
-  setToolbarInstanceCounter,
   STORAGE_KEY_THEME,
   themeInfo,
-  toolbarInstanceCounter,
 } from "./shared.js";
 
 /** @typedef {import("./shared.js").ThemeId} ThemeId */
@@ -21,11 +21,11 @@ export class VscodeDevToolbar extends HTMLElement {
   constructor() {
     super();
 
-    if (toolbarInstanceCounter > 0) {
+    if (activeToolbarInstance) {
       return;
     }
 
-    setToolbarInstanceCounter(toolbarInstanceCounter + 1);
+    setActiveToolbarInstance(this);
 
     let shadowRoot = this.attachShadow({ mode: "open" });
     shadowRoot.appendChild(toolbarTemplate.content.cloneNode(true));
@@ -73,6 +73,13 @@ export class VscodeDevToolbar extends HTMLElement {
       "change",
       this._onThemeSelectorChange
     );
+  }
+
+  /** @param {ThemeId} value */
+  setThemeSelector(value) {
+    if (this._themeSelector) {
+      this._themeSelector.value = value;
+    }
   }
 
   _onOpenToolbarButtonClick = () => {

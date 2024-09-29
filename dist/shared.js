@@ -1,6 +1,8 @@
 // @ts-check
 
 /**
+ * @typedef {import("./toolbar.js").VscodeDevToolbar} VscodeDevToolbar
+ * 
  * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
  *
  * @typedef {Record<ThemeId, {data?: string; isFetching?: boolean;}>} ThemeRegistry
@@ -40,13 +42,6 @@ export const setDemoInstanceCounter = (/** @type {number} */ newVal) => {
   demoInstanceCounter = newVal;
 };
 
-/** Toolbar component instance counter */
-export let toolbarInstanceCounter = 0;
-
-export const setToolbarInstanceCounter = (/** @type {number} */ newVal) => {
-  toolbarInstanceCounter = newVal;
-};
-
 /** @type {{[key: string]: HTMLDivElement | null}} */
 export let themeSelectorInstances = {};
 
@@ -54,6 +49,14 @@ export let themeSelectorInstances = {};
 export const setThemeSelectorInstances = (newVal) => {
   themeSelectorInstances = newVal;
 };
+
+/** @type {VscodeDevToolbar | null} */
+export let activeToolbarInstance = null;
+
+/** @param {VscodeDevToolbar} toolbar */
+export const setActiveToolbarInstance = (toolbar) => {
+  activeToolbarInstance = toolbar;
+}
 
 /** @type {ThemeRegistry} */
 const themes = {

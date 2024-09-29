@@ -1,6 +1,7 @@
 // @ts-check
 
 import {
+  activeToolbarInstance,
   applyTheme,
   demoInstanceCounter,
   getDemoTemplateHTML,
@@ -78,6 +79,10 @@ export class VscodeDemo extends HTMLElement {
 
     setActiveDemoTabs(value);
     setAllDemoTabsDisabled(true);
+
+    if (activeToolbarInstance) {
+      activeToolbarInstance.setThemeSelector(value);
+    }
 
     applyTheme(value).then(() => {
       setAllDemoTabsDisabled(false);
