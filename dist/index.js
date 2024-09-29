@@ -8,13 +8,22 @@ const logoSVG = `
     </g>
   </svg>`;
 
+const STORAGE_KEY_PREFIX = "vscode-webview-playground";
+const STORAGE_KEY_THEME = `${STORAGE_KEY_PREFIX}_theme`;
+const STORAGE_KEY_UNDERLINE_LINKS = `${STORAGE_KEY_PREFIX}_underline-links`;
+const STORAGE_KEY_REDUCE_MOTION = `${STORAGE_KEY_PREFIX}_reduce-motion`;
+const TOOLBAR_TAG_NAME = "vscode-dev-toolbar";
+const DEMO_TAG_NAME = "vscode-demo";
+
 /** @type {ThemeId} */
 let appliedTheme;
 /** Calculated url of the script directory base on the `import.meta` property. */
 // TODO: Use import.meta.resolve()
 let directoryUrl;
 /** Demo component instance counter */
-let instanceCounter = 0;
+let demoInstanceCounter = 0;
+/** Toolbar component instance counter */
+let toolbarInstanceCounter = 0;
 /** @type {{[key: string]: HTMLDivElement | null}} */
 const themeSelectorInstances = {};
 /**
@@ -36,7 +45,8 @@ const themes = {
 /**
  * @typedef  ThemeInfoItem
  * @type {object}
- * @property {string[]} themeKind - Theme kind.
+ * @property {string} themeKind - Theme kind.
+ * @property {string[]} bodyClasses - Classes added to body.
  * @property {string} name - Theme short name.
  * @property {string=} longName - Detailed name of theme.
  * @property {string} label - Theme switcher button label.
@@ -48,42 +58,48 @@ const themes = {
 /** @type {ThemeInfo} */
 const themeInfo = {
   light: {
-    themeKind: ["vscode-light"],
+    themeKind: "vscode-light",
+    bodyClasses: ["vscode-light"],
     name: "Light+",
     longName: "Default Light+",
     label: "Light",
     description: "Default light theme before April 2023 (version 1.78)",
   },
   "light-v2": {
-    themeKind: ["vscode-light"],
+    themeKind: "vscode-light",
+    bodyClasses: ["vscode-light"],
     name: "Light Modern",
     longName: "Default Light Modern",
     label: "Light v2",
     description: "Default light theme since April 2023 (version 1.78)",
   },
   dark: {
-    themeKind: ["vscode-dark"],
+    themeKind: "vscode-dark",
+    bodyClasses: ["vscode-dark"],
     name: "Dark+",
     longName: "Default Dark+",
     label: "Dark",
     description: "Default dark theme before April 2023 (version 1.78)",
   },
   "dark-v2": {
-    themeKind: ["vscode-dark"],
+    themeKind: "vscode-dark",
+    bodyClasses: ["vscode-dark"],
     name: "Dark Modern",
     longName: "Default Dark Modern",
     label: "Dark v2",
     description: "Default dark theme since April 2023 (version 1.78)",
   },
   "hc-light": {
-    themeKind: ["vscode-high-contrast-light", "vscode-high-contrast"],
+    themeKind: "vscode-high-contrast-light",
+    bodyClasses: ["vscode-high-contrast-light", "vscode-high-contrast"],
     name: "Light High Contrast",
     longName: "Default High Contrast Light",
     label: "HC Light",
     description: "Light High Contrast theme",
   },
   "hc-dark": {
-    themeKind: ["vscode-high-contrast"],
+    themeKind: "vscode-high-contrast",
+    bodyClasses: ["vscode-high-contrast"],
     name: "Dark High Contrast",
     longName: "Default High Contrast",
     label: "HC Dark",
@@ -91,7 +107,7 @@ const themeInfo = {
   },
 };
 
-function getTabHeadersHTML() {
+function getDemoTabHeadersHTML() {
   const keys = Object.keys(themeInfo);
 
   return keys.reduce((previousValue, _currentValue, i, arr) => {
@@ -99,6 +115,17 @@ function getTabHeadersHTML() {
     const label = themeInfo[arr[i]].label;
 
     return `${previousValue}<button title="${title}" value="${arr[i]}" class="theme-button">${label}</button>`;
+  }, "");
+}
+
+function getToolbarThemeSelectorOptions() {
+  const keys = Object.keys(themeInfo);
+
+  return keys.reduce((previousValue, _currentValue, i, arr) => {
+    const id = arr[i];
+    const { name } = /** @type {ThemeInfoItem} */ (themeInfo[id]);
+
+    return `${previousValue}<option value="${id}">${name}</option>`;
   }, "");
 }
 
@@ -160,19 +187,22 @@ async function applyTheme(themeId) {
 
   appliedTheme = themeId;
 
-  const themeKeys = Object.keys(themeInfo);
-  const themeKindClasses = [];
-  const kind = themeInfo[themeId].themeKind;
+  const themeKeys = /** @type {ThemeId[]} */ (Object.keys(themeInfo));
+  const allAvailableBodyClasses = [];
 
   themeKeys.forEach((t) => {
-    themeKindClasses.push(...themeInfo[t].themeKind);
+    themeInfo[t].bodyClasses.forEach((tk) => {
+      allAvailableBodyClasses.push(tk);
+    });
   });
 
-  const uniqThemeKindClasses = [...new Set(themeKindClasses)];
+  const uniqBodyClasses = [...new Set(allAvailableBodyClasses)];
 
-  document.body.classList.remove(...uniqThemeKindClasses);
-  document.body.classList.add(`vscode-${themeInfo[themeId].themeKind}`);
-  document.body.dataset.vscodeThemeKind = `vscode-${kind}`;
+  document.body.classList.remove(...uniqBodyClasses);
+  document.body.classList.add(...themeInfo[themeId].bodyClasses);
+  document.body.dataset.vscodeThemeKind = themeInfo[themeId].themeKind;
+  document.body.dataset.vscodeThemeName = themeInfo[themeId].name;
+  document.body.dataset.vscodeThemeId = themeInfo[themeId].longName;
 
   themes[themeId] = themes[themeId] || {};
 
@@ -192,7 +222,91 @@ async function applyTheme(themeId) {
   }
 }
 
-class VscodeDevToolbar extends HTMLElement {}
+function getInitialTheme() {
+  const defaultTheme = /** @type {ThemeId} */ (Object.keys(themeInfo)[0]);
+  let selectedTheme = defaultTheme;
+  const theme = localStorage.getItem(STORAGE_KEY_THEME);
+
+  if (theme && theme in themeInfo) {
+    selectedTheme = /** @type {ThemeId} */ (theme);
+  }
+
+  return selectedTheme;
+}
+
+// TODO: remove this
+async function applyInitialTheme() {
+  const defaultTheme = /** @type {ThemeId} */ (Object.keys(themeInfo)[0]);
+  let selectedTheme = defaultTheme;
+  const theme = localStorage.getItem(STORAGE_KEY_THEME);
+  const reduceMotion = localStorage.getItem(STORAGE_KEY_REDUCE_MOTION);
+  const underlineLinks = localStorage.getItem(STORAGE_KEY_UNDERLINE_LINKS);
+
+  if (theme && theme in themeInfo) {
+    selectedTheme = /** @type {ThemeId} */ (theme);
+  }
+
+  document.body.classList.toggle(
+    "vscode-reduce-motion",
+    reduceMotion === "true"
+  );
+
+  await applyTheme(selectedTheme);
+  setActiveDemoTabs(selectedTheme);
+}
+
+const toolbarTemplate = document.createElement("template");
+toolbarTemplate.innerHTML = `
+  <style>
+    :host {
+      bottom: 30px;
+      position: fixed;
+      right: 30px;
+    }
+
+    label {
+      user-select: none;
+    }
+  </style>
+  <div>
+    <div>
+      <label for="theme-selector">Theme</label>
+      <select id="theme-selector">${getToolbarThemeSelectorOptions()}</select>
+    </div>
+    <div>
+      <input type="checkbox" id="toggle-underline">
+      <label for="toggle-underline">Underline links <span>(accessibility.underlineLinks)</span></label>
+    </div>
+    <div>
+      <input type="checkbox" id="toggle-reduce-motion">
+      <label for="toggle-reduce-motion">Reduce motion <span>(workbench.reduceMotion)</span></label>
+    </div>
+    <!-- TODO: location (sidebar, editor) -->
+  </div>
+`;
+
+class VscodeDevToolbar extends HTMLElement {
+  constructor() {
+    super();
+
+    if (toolbarInstanceCounter > 0) {
+      return;
+    }
+
+    toolbarInstanceCounter += 1;
+
+    let shadowRoot = this.attachShadow({ mode: "open" });
+    shadowRoot.appendChild(toolbarTemplate.content.cloneNode(true));
+  }
+
+  connectedCallback() {
+    const initialTheme = getInitialTheme();
+
+    applyTheme(initialTheme).then(() => {
+      setActiveDemoTabs(initialTheme);
+    });
+  }
+}
 
 const demoTemplate = document.createElement("template");
 demoTemplate.innerHTML = `
@@ -328,7 +442,7 @@ demoTemplate.innerHTML = `
   </style>
   <div class="theme-selector-wrapper">
     <div id="theme-selector" class="theme-selector">
-      ${getTabHeadersHTML()}
+      ${getDemoTabHeadersHTML()}
       <button type="button" class="toggle-fullscreen-button" id="toggle-fullscreen" title="toggle fullscreen">
         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="full">
           <path d="M3 12h10V4H3v8zm2-6h6v4H5V6zM2 6H1V2.5l.5-.5H5v1H2v3zm13-3.5V6h-1V3h-3V2h3.5l.5.5zM14 10h1v3.5l-.5.5H11v-1h3v-3zM2 13h3v1H1.5l-.5-.5V10h1v3z"/>
@@ -366,8 +480,8 @@ class VscodeDemo extends HTMLElement {
   }
 
   connectedCallback() {
-    instanceCounter++;
-    themeSelectorInstances[`instance-${instanceCounter}`] =
+    demoInstanceCounter++;
+    themeSelectorInstances[`instance-${demoInstanceCounter}`] =
       this._elThemeSelector;
 
     this._elButtons?.forEach((b) => {
@@ -378,10 +492,10 @@ class VscodeDemo extends HTMLElement {
       this._onToggleFullscreenButtonClick
     );
 
-    const defaultTheme = /** @type {ThemeId} */ (Object.keys(themeInfo)[0]);
+    const initialTheme = getInitialTheme();
 
-    applyTheme(defaultTheme);
-    setActiveDemoTabs(defaultTheme);
+    applyTheme(initialTheme);
+    setActiveDemoTabs(initialTheme);
   }
 
   disconnectedCallback() {
@@ -407,6 +521,8 @@ class VscodeDemo extends HTMLElement {
     applyTheme(value).then(() => {
       setAllDemoTabsDisabled(false);
     });
+
+    localStorage.setItem(STORAGE_KEY_THEME, value);
   };
 
   _onToggleFullscreenButtonClick = () => {
@@ -418,5 +534,5 @@ class VscodeDemo extends HTMLElement {
   };
 }
 
-customElements.define("vscode-dev-toolbar", VscodeDevToolbar);
-customElements.define("vscode-demo", VscodeDemo);
+customElements.define(TOOLBAR_TAG_NAME, VscodeDevToolbar);
+customElements.define(DEMO_TAG_NAME, VscodeDemo);
