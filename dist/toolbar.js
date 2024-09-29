@@ -9,12 +9,15 @@ import {
   setActiveDemoTabs,
   setActiveToolbarInstance,
   setAllDemoTabsDisabled,
+  setViewContainer,
   STORAGE_KEY_SHOW_UI,
   STORAGE_KEY_THEME,
+  STORAGE_KEY_VIEW_CONTAINER,
   themeInfo,
 } from "./shared.js";
 
 /** @typedef {import("./shared.js").ThemeId} ThemeId */
+/** @typedef {import("./shared.js").ViewContainer} ViewContainer */
 
 const DEFAULT_STYLES_ID = "_defaultStyles";
 const ATTR_SHOW_UI = "show-ui";
@@ -55,6 +58,9 @@ export class VscodeDevToolbar extends HTMLElement {
     this._themeSelector = /** @type {HTMLSelectElement | null} */ (
       this.shadowRoot?.querySelector("#theme-selector")
     );
+    this._locationSelector = /** @type {HTMLSelectElement | null} */ (
+      this.shadowRoot?.querySelector("#location-selector")
+    );
 
     this._openButton?.addEventListener("click", this._onOpenToolbarButtonClick);
     this._closeButton?.addEventListener(
@@ -64,6 +70,10 @@ export class VscodeDevToolbar extends HTMLElement {
     this._themeSelector?.addEventListener(
       "change",
       this._onThemeSelectorChange
+    );
+    this._locationSelector?.addEventListener(
+      "change",
+      this._onLocationSelectorChange
     );
 
     const initialTheme = getInitialTheme();
@@ -84,6 +94,11 @@ export class VscodeDevToolbar extends HTMLElement {
     } else {
       this._showUi(savedUiState === "true");
     }
+
+    const viewContainer = /** @type {ViewContainer} */ (
+      localStorage.getItem(STORAGE_KEY_VIEW_CONTAINER) ?? "editor"
+    );
+    setViewContainer(viewContainer);
   }
 
   disconnectedCallback() {
@@ -99,6 +114,10 @@ export class VscodeDevToolbar extends HTMLElement {
       "change",
       this._onThemeSelectorChange
     );
+    this._locationSelector?.removeEventListener(
+      "change",
+      this._onLocationSelectorChange
+    );
   }
 
   /**
@@ -108,7 +127,6 @@ export class VscodeDevToolbar extends HTMLElement {
    * @param {string} newValue
    */
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log(name, oldValue, newValue, this.hasAttribute(ATTR_SHOW_UI));
     if (name === ATTR_SHOW_UI) {
       this._showUi(this.hasAttribute(ATTR_SHOW_UI));
     }
@@ -187,7 +205,16 @@ export class VscodeDevToolbar extends HTMLElement {
     localStorage.setItem(STORAGE_KEY_THEME, value);
   };
 
-  _onLocationSelectorChange = () => {};
+  _onLocationSelectorChange = () => {
+    const viewContainer = /** @type {ViewContainer} */ (
+      this._locationSelector?.value
+    );
+
+    if (viewContainer) {
+      setViewContainer(viewContainer);
+      localStorage.setItem(STORAGE_KEY_VIEW_CONTAINER, viewContainer);
+    }
+  };
 
   _onToggleUnderlineChange = () => {};
 

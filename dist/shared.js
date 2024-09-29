@@ -17,6 +17,8 @@
  * @property {string} description - Theme description.
  *
  * @typedef {Record<ThemeId, ThemeInfoItem>} ThemeInfo
+ *
+ * @typedef {"editor" | "sidebar" | "panel"} ViewContainer
  */
 
 export const STORAGE_KEY_PREFIX = "vscode-webview-playground";
@@ -24,6 +26,7 @@ export const STORAGE_KEY_THEME = `${STORAGE_KEY_PREFIX}_theme`;
 export const STORAGE_KEY_UNDERLINE_LINKS = `${STORAGE_KEY_PREFIX}_underline-links`;
 export const STORAGE_KEY_REDUCE_MOTION = `${STORAGE_KEY_PREFIX}_reduce-motion`;
 export const STORAGE_KEY_SHOW_UI = `${STORAGE_KEY_PREFIX}_show-ui`;
+export const STORAGE_KEY_VIEW_CONTAINER = `${STORAGE_KEY_PREFIX}_view-container`;
 export const TOOLBAR_TAG_NAME = "vscode-dev-toolbar";
 export const DEMO_TAG_NAME = "vscode-demo";
 
@@ -227,6 +230,29 @@ export function setAllDemoTabsDisabled(disabled) {
   });
 }
 
+// TODO: rename location in component
+/** @param {ViewContainer} viewContainer */
+export function setViewContainer(viewContainer) {
+  let cssProperty;
+
+  switch (viewContainer) {
+    case "editor":
+      cssProperty = "var(--vscode-editor-background)";
+      break;
+    case "panel":
+      cssProperty = "var(--vscode-panel-background)";
+      break;
+    case "sidebar":
+    default:
+      cssProperty = "var(--vscode-sideBar-background)";
+  }
+
+  document.body.style.setProperty(
+    "--playground-body-background",
+    cssProperty
+  );
+}
+
 function getToolbarThemeSelectorOptionsHTML() {
   const keys = Object.keys(themeInfo);
 
@@ -248,7 +274,7 @@ export function getDefaultStylesCSS() {
 
     body {
       overscroll-behavior-x: none;
-      background-color: transparent;
+      background-color: var(--playground-body-background);
       color: var(--vscode-editor-foreground);
       font-family: var(--vscode-font-family);
       font-weight: var(--vscode-font-weight);
