@@ -3,6 +3,7 @@
 import {
   activeToolbarInstance,
   applyTheme,
+  getDefaultStylesCSS,
   getInitialTheme,
   getToolbarTemplateHTML,
   setActiveDemoTabs,
@@ -13,6 +14,8 @@ import {
 } from "./shared.js";
 
 /** @typedef {import("./shared.js").ThemeId} ThemeId */
+
+const DEFAULT_STYLES_ID = "_defaultStyles";
 
 const toolbarTemplate = document.createElement("template");
 toolbarTemplate.innerHTML = getToolbarTemplateHTML();
@@ -32,32 +35,43 @@ export class VscodeDevToolbar extends HTMLElement {
   }
 
   connectedCallback() {
-    this._openButton = /** @type {HTMLButtonElement} */ (
+    if (!this.shadowRoot) {
+      return;
+    }
+
+    this._openButton = /** @type {HTMLButtonElement | null} */ (
       this.shadowRoot?.querySelector(".open-toolbar-button")
     );
-    this._closeButton = /** @type {HTMLButtonElement} */ (
+    this._closeButton = /** @type {HTMLButtonElement| null} */ (
       this.shadowRoot?.querySelector(".close-toolbar-button")
     );
-    this._panel = /** @type {HTMLDivElement} */ (
+    this._panel = /** @type {HTMLDivElement | null} */ (
       this.shadowRoot?.querySelector(".panel")
     );
-    this._themeSelector = /** @type {HTMLSelectElement} */ (
+    this._themeSelector = /** @type {HTMLSelectElement | null} */ (
       this.shadowRoot?.querySelector("#theme-selector")
     );
 
-    this._openButton.addEventListener("click", this._onOpenToolbarButtonClick);
-    this._closeButton.addEventListener(
+    this._openButton?.addEventListener("click", this._onOpenToolbarButtonClick);
+    this._closeButton?.addEventListener(
       "click",
       this._onCloseToolbarButtonClick
     );
-    this._themeSelector.addEventListener("change", this._onThemeSelectorChange);
+    this._themeSelector?.addEventListener(
+      "change",
+      this._onThemeSelectorChange
+    );
 
     const initialTheme = getInitialTheme();
-    this._themeSelector.value = initialTheme;
-    
+
+    if (this._themeSelector) {
+      this._themeSelector.value = initialTheme;
+    }
+
     applyTheme(initialTheme).then(() => {
       setActiveDemoTabs(initialTheme);
     });
+    this._applyDefaultStyles();
   }
 
   disconnectedCallback() {
@@ -79,6 +93,17 @@ export class VscodeDevToolbar extends HTMLElement {
   setThemeSelector(value) {
     if (this._themeSelector) {
       this._themeSelector.value = value;
+    }
+  }
+
+  _applyDefaultStyles() {
+    const defaultStyles = document.getElementById(DEFAULT_STYLES_ID);
+
+    if (!defaultStyles) {
+      const styleElement = document.createElement("style");
+      styleElement.setAttribute("id", DEFAULT_STYLES_ID);
+      styleElement.innerHTML = getDefaultStylesCSS();
+      document.head.appendChild(styleElement);
     }
   }
 
