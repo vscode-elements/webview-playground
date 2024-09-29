@@ -24,7 +24,6 @@ export const STORAGE_KEY_REDUCE_MOTION = `${STORAGE_KEY_PREFIX}_reduce-motion`;
 export const TOOLBAR_TAG_NAME = "vscode-dev-toolbar";
 export const DEMO_TAG_NAME = "vscode-demo";
 
-const css = String.raw;
 const html = String.raw;
 
 /** @type {ThemeId} */
@@ -67,7 +66,7 @@ const themes = {
 };
 
 /** @type {ThemeInfo} */
-const themeInfo = {
+export const themeInfo = {
   light: {
     themeKind: "vscode-light",
     bodyClasses: ["vscode-light"],
@@ -251,6 +250,8 @@ export function getToolbarTemplateHTML() {
     <style>
       :host {
         bottom: 30px;
+        font-family: sans-serif;
+        font-size: 14px;
         position: fixed;
         right: 30px;
       }
@@ -397,7 +398,6 @@ export function getToolbarTemplateHTML() {
             </div>
           </div>
         </fieldset>
-        <!-- TODO: location (sidebar, editor) -->
         <button type="button" class="close-toolbar-button" title="Close toolbar">
           <svg
             width="16"
