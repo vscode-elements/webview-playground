@@ -178,6 +178,10 @@ export async function applyTheme(themeId) {
 
   if (themes[themeId].data) {
     document.documentElement.setAttribute("style", themes[themeId].data);
+    document.documentElement.style.setProperty(
+      "--vscode-font-family",
+      getDefaultFontStack()
+    );
     return;
   }
 
@@ -189,6 +193,10 @@ export async function applyTheme(themeId) {
     themes[themeId].isFetching = false;
     themes[themeId].data = theme;
     document.documentElement.setAttribute("style", themes[themeId].data);
+    document.documentElement.style.setProperty(
+      "--vscode-font-family",
+      getDefaultFontStack()
+    );
   }
 }
 
@@ -230,6 +238,18 @@ export function setAllDemoTabsDisabled(disabled) {
   });
 }
 
+export function getDefaultFontStack() {
+  if (navigator.userAgent.indexOf("Linux") > -1) {
+    return 'system-ui, "Ubuntu", "Droid Sans", sans-serif';
+  } else if (navigator.userAgent.indexOf("Mac") > -1) {
+    return "-apple-system, BlinkMacSystemFont, sans-serif";
+  } else if (navigator.userAgent.indexOf("Windows") > -1) {
+    return '"Segoe WPC", "Segoe UI", sans-serif';
+  } else {
+    return "sans-serif";
+  }
+}
+
 // TODO: rename location in component
 /** @param {ViewContainer} viewContainer */
 export function setViewContainer(viewContainer) {
@@ -247,10 +267,7 @@ export function setViewContainer(viewContainer) {
       cssProperty = "var(--vscode-sideBar-background)";
   }
 
-  document.body.style.setProperty(
-    "--playground-body-background",
-    cssProperty
-  );
+  document.body.style.setProperty("--playground-body-background", cssProperty);
 }
 
 function getToolbarThemeSelectorOptionsHTML() {
