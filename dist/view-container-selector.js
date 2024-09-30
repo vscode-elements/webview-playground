@@ -44,6 +44,9 @@ export class VscodeViewContainerSelector extends HTMLElement {
   /** @type {Set<VscodeViewContainerSelector>} */
   static instances = new Set();
 
+  /** @type {ViewContainer} */
+  static appliedViewContainer;
+
   #select;
 
   constructor() {
@@ -72,6 +75,14 @@ export class VscodeViewContainerSelector extends HTMLElement {
   connectedCallback() {
     this.#select.addEventListener("change", this.#handleSelectorChange);
     VscodeViewContainerSelector.instances.add(this);
+
+    const viewContainer = /** @type {ViewContainer} */ (
+      localStorage.getItem(STORAGE_KEY_VIEW_CONTAINER) ?? "editor"
+    );
+
+    if (VscodeViewContainerSelector.appliedViewContainer !== viewContainer) {
+      this.#setViewContainer(viewContainer);
+    }
   }
 
   disconnectedCallback() {
@@ -109,6 +120,8 @@ export class VscodeViewContainerSelector extends HTMLElement {
       "--playground-body-background",
       cssProperty
     );
+
+    VscodeViewContainerSelector.appliedViewContainer = viewContainer;
   }
 
   /** @param {ViewContainer} viewContainer */
