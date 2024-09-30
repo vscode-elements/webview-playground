@@ -2,8 +2,6 @@
 
 const html = String.raw;
 
-/** @typedef {import("./shared.js").ThemeId} ThemeId */
-
 function getComponentTemplate() {
   return html`
     <style>
@@ -43,22 +41,23 @@ function getComponentTemplate() {
         top: 35px;
       }
 
-      .theme-selector-wrapper {
+      .header-wrapper {
         position: relative;
       }
 
-      .theme-selector {
+      .header {
         align-items: center;
         background-color: var(--toolbar-background, #fff);
         box-sizing: border-box;
         display: flex;
         flex-wrap: wrap;
+        padding: 10px;
         position: relative;
         width: 100%;
         z-index: 2;
       }
 
-      .theme-selector:after {
+      .header:after {
         background-color: var(--toolbar-normal, #24292e);
         bottom: 0;
         content: "";
@@ -71,39 +70,11 @@ function getComponentTemplate() {
         width: 100%;
       }
 
-      .theme-selector button.theme-button {
-        background-color: transparent;
-        border: 0;
-        border-bottom: 3px solid transparent;
-        cursor: pointer;
-        color: var(--toolbar-normal, #24292e);
-        display: block;
-        outline: none;
-        overflow: hidden;
-        padding: 10px 15px 7px;
-      }
-
-      .theme-selector button.theme-button:disabled {
-        opacity: 0.5;
-      }
-
-      .theme-selector button.theme-button.active {
-        border-bottom-color: var(--toolbar-active, #007acc);
-        color: var(--toolbar-active, #007acc);
-      }
-
-      .theme-selector button.theme-button span {
-        display: block;
-        outline-offset: 2px;
-        pointer-events: none;
-        white-space: nowrap;
-      }
-
-      .theme-selector button:focus-visible span {
+      .header button:focus-visible span {
         outline: 1px solid var(--toolbar-active, #007acc);
       }
 
-      .theme-selector .toggle-fullscreen-button {
+      .header .toggle-fullscreen-button {
         align-items: center;
         background-color: transparent;
         border: 0;
@@ -112,11 +83,10 @@ function getComponentTemplate() {
         display: flex;
         justify-content: center;
         margin-left: auto;
-        margin-right: 5px;
         padding: 5px;
       }
 
-      .theme-selector .toggle-fullscreen-button .normal {
+      .header .toggle-fullscreen-button .normal {
         display: none;
       }
 
@@ -128,16 +98,16 @@ function getComponentTemplate() {
         display: none;
       }
 
-      .theme-selector .toggle-fullscreen-button:focus {
+      .header .toggle-fullscreen-button:focus {
         outline: none;
       }
 
-      .theme-selector .toggle-fullscreen-button:focus-visible {
+      .header .toggle-fullscreen-button:focus-visible {
         outline: 1px solid var(--toolbar-active, #007acc);
       }
     </style>
-    <div class="theme-selector-wrapper">
-      <div id="theme-selector" class="theme-selector">
+    <div class="header-wrapper">
+      <div id="header" class="header">
         <vscode-theme-selector></vscode-theme-selector>
         <button
           type="button"
@@ -183,11 +153,9 @@ export class VscodeDemo extends HTMLElement {
   static template;
 
   /** @type {HTMLDivElement | null} */
-  _elThemeSelector = null;
-  /** @type {NodeListOf<HTMLButtonElement> | null} */
-  _elButtons = null;
+  #header = null;
   /** @type {HTMLButtonElement | null} */
-  _elToggleFullscreen = null;
+  #toggleFullScreen = null;
 
   constructor() {
     super();
@@ -200,20 +168,20 @@ export class VscodeDemo extends HTMLElement {
     let shadowRoot = this.attachShadow({ mode: "open" });
     shadowRoot.appendChild(VscodeDemo.template.content.cloneNode(true));
 
-    this._elThemeSelector = shadowRoot.querySelector(".theme-selector");
-    this._elToggleFullscreen =
-      this._elThemeSelector?.querySelector(".toggle-fullscreen-button") ?? null;
+    this.#header = shadowRoot.querySelector("#header");
+    this.#toggleFullScreen =
+      this.#header?.querySelector("#toggle-fullscreen") ?? null;
   }
 
   connectedCallback() {
-    this._elToggleFullscreen?.addEventListener(
+    this.#toggleFullScreen?.addEventListener(
       "click",
       this._onToggleFullscreenButtonClick
     );
   }
 
   disconnectedCallback() {
-    this._elToggleFullscreen?.removeEventListener(
+    this.#toggleFullScreen?.removeEventListener(
       "click",
       this._onToggleFullscreenButtonClick
     );
