@@ -146,7 +146,9 @@ export class VscodeThemeSelector extends HTMLElement {
     }
 
     let shadowRoot = this.attachShadow({ mode: "open" });
-    shadowRoot.appendChild(VscodeThemeSelector.template.content.cloneNode(true));
+    shadowRoot.appendChild(
+      VscodeThemeSelector.template.content.cloneNode(true)
+    );
 
     this.#dropdown = /** @type {HTMLSelectElement} */ (
       this.shadowRoot?.querySelector("#theme-selector")
@@ -171,6 +173,11 @@ export class VscodeThemeSelector extends HTMLElement {
   /** @param {ThemeId} value */
   setSelectedOption(value) {
     this.#dropdown.value = value;
+  }
+
+  /** @param {boolean} force */
+  disableSelector(force) {
+    this.#dropdown.disabled = force;
   }
 
   #getDirectoryUrl() {
@@ -299,9 +306,23 @@ export class VscodeThemeSelector extends HTMLElement {
     });
   }
 
+  /**
+   * @param {boolean} force
+   */
+  #disableAllSelectors(force) {
+    VscodeThemeSelector.instances.forEach((s) => {
+      s.disableSelector(force);
+    });
+  }
+
   #handleDropdownChange = () => {
     const theme = /** @type {ThemeId} */ (this.#dropdown.value);
-    this.#applyTheme(theme);
-    this.#syncInstances(theme);
+
+    this.#disableAllSelectors(true);
+
+    this.#applyTheme(theme).then(() => {
+      this.#syncInstances(theme);
+      this.#disableAllSelectors(false);
+    });
   };
 }
