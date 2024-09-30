@@ -163,6 +163,11 @@ export class VscodeThemeSelector extends HTMLElement {
     this.setSelectedOption(initialTheme);
   }
 
+  disconnectedCallback() {
+    this.#dropdown?.removeEventListener("change", this.#handleDropdownChange);
+    VscodeThemeSelector.instances.delete(this);
+  }
+
   /** @param {ThemeId} value */
   setSelectedOption(value) {
     this.#dropdown.value = value;
