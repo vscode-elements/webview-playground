@@ -518,18 +518,10 @@ export function getToolbarTemplateHTML() {
       </button>
       <div class="panel">
         <div class="row select">
-          <label for="theme-selector">Theme</label>
-          <select id="theme-selector">
-            ${getToolbarThemeSelectorOptionsHTML()}
-          </select>
+          <vscode-theme-selector></vscode-theme-selector>
         </div>
         <div class="row select">
-          <label for="location-selector">Location</label>
-          <select id="location-selector">
-            <option value="editor">Editor</option>
-            <option value="sidebar">Sidebar</option>
-            <option value="panel">Panel</option>
-          </select>
+          <vscode-view-container-selector></vscode-view-container-selector>
         </div>
         <fieldset>
           <legend>User preferences</legend>
