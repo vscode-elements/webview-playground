@@ -67,9 +67,9 @@ export class VscodeToggleMotion extends HTMLElement {
     VscodeToggleMotion.instances.delete(this);
   }
 
-  /** @param {boolean} force */
-  setSelectedOption(force) {
-    this.#checkbox.checked = force;
+  /** @param {boolean} checked */
+  setChecked(checked) {
+    this.#checkbox.checked = checked;
   }
 
   /** @param {boolean} force */
@@ -82,7 +82,7 @@ export class VscodeToggleMotion extends HTMLElement {
     this.#toggleState(force);
     localStorage.setItem(STORAGE_KEY_MOTION, force.toString());
     VscodeToggleMotion.instances.forEach((el) => {
-      el.setSelectedOption(force);
+      el.setChecked(force);
     });
   };
 }

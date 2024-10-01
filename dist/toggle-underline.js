@@ -71,9 +71,9 @@ export class VscodeToggleUnderline extends HTMLElement {
     VscodeToggleUnderline.instances.delete(this);
   }
 
-  /** @param {boolean} underline */
-  setSelectedOption(underline) {
-    this.#checkbox.checked = underline;
+  /** @param {boolean} checked */
+  setChecked(checked) {
+    this.#checkbox.checked = checked;
   }
 
   /** @param {boolean} force */
@@ -99,7 +99,7 @@ export class VscodeToggleUnderline extends HTMLElement {
 
     VscodeToggleUnderline.instances.forEach((el) => {
       if (el !== this) {
-        el.setSelectedOption(underline);
+        el.setChecked(underline);
       }
     });
   };
