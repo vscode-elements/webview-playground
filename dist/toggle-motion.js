@@ -2,7 +2,7 @@
 
 const html = String.raw;
 
-export const STORAGE_KEY_MOTION = "vscode-theme-selector_motion";
+export const STORAGE_KEY_MOTION = "vscode-playground:reduce-motion";
 
 function getComponentTemplate() {
   return html`

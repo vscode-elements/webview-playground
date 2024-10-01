@@ -5,7 +5,7 @@ const css = String.raw;
 
 const DEFAULT_STYLES_ID = "_defaultStyles";
 const ATTR_SHOW_UI = "show-ui";
-const STORAGE_KEY_SHOW_UI = "vscode-dev-toolbar_show-ui";
+const STORAGE_KEY_SHOW_UI = "vscode-playground:show-dev-toolbar-ui";
 
 function getDefaultStylesCSS() {
   return css`

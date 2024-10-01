@@ -21,7 +21,7 @@ import { STORAGE_KEY_UNDERLINE } from "./toggle-underline.js";
 
 const html = String.raw;
 
-export const STORAGE_KEY_THEME = "vscode-theme-selector_theme";
+export const STORAGE_KEY_THEME = "vscode-playground:theme";
 
 /**
  * @param {ThemeInfo} themeInfo

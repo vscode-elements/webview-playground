@@ -2,7 +2,7 @@
 
 const html = String.raw;
 
-export const STORAGE_KEY_UNDERLINE = "vscode-webview-playground_underline";
+export const STORAGE_KEY_UNDERLINE = "vscode-playground:underline";
 
 function getComponentTemplate() {
   return html`

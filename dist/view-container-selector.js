@@ -6,7 +6,7 @@
 
 const html = String.raw;
 
-const STORAGE_KEY_VIEW_CONTAINER = "vscode-view-container-selector_view-container";
+const STORAGE_KEY_VIEW_CONTAINER = "vscode-playground:view-container";
 
 function getComponentTemplate() {
   return html`
