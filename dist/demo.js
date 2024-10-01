@@ -74,6 +74,48 @@ function getComponentTemplate() {
         outline: 1px solid var(--toolbar-active, #007acc);
       }
 
+      .menu-wrapper {
+        position: relative;
+      }
+
+      .toggle-menu-button {
+        background-color: transparent;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+        display: block;
+        margin: 0 0 0 2px;
+        padding: 3px;
+      }
+
+      .toggle-menu-button.active {
+        background-color: rgba(166, 166, 166, 0.31);
+      }
+
+      .toggle-menu-button svg {
+        display: block;
+        height: 16px;
+        width: 16px;
+      }
+
+      .menu {
+        background-color: #fff;
+        border: 1px solid #cdcdcd;
+        border-radius: 3px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+        display: none;
+        left: 1px;
+        padding: 10px;
+        position: absolute;
+        top: 24px;
+        width: 200px;
+        z-index: 3;
+      }
+
+      .menu.open {
+        display: block;
+      }
+
       .header .toggle-fullscreen-button {
         align-items: center;
         background-color: transparent;
@@ -109,6 +151,30 @@ function getComponentTemplate() {
     <div class="header-wrapper">
       <div id="header" class="header">
         <vscode-theme-selector></vscode-theme-selector>
+        <div class="menu-wrapper">
+          <button
+            type="button"
+            class="toggle-menu-button"
+            id="toggle-menu"
+            title="Open menu"
+          >
+            <svg
+              width="16"
+              height="16"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M7.444 13.832a1 1 0 1 0 1.111-1.663 1 1 0 0 0-1.11 1.662zM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0-5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"
+              />
+            </svg>
+          </button>
+          <div class="menu">
+            <vscode-view-container-selector></vscode-view-container-selector>
+          </div>
+        </div>
         <button
           type="button"
           class="toggle-fullscreen-button"
@@ -154,8 +220,12 @@ export class VscodeDemo extends HTMLElement {
 
   /** @type {HTMLDivElement | null} */
   #header = null;
+  /** @type {HTMLDivElement | null} */
+  #menu = null;
   /** @type {HTMLButtonElement | null} */
   #toggleFullScreen = null;
+  /** @type {HTMLButtonElement | null} */
+  #toggleMenuButton = null;
 
   constructor() {
     super();
@@ -169,29 +239,41 @@ export class VscodeDemo extends HTMLElement {
     shadowRoot.appendChild(VscodeDemo.template.content.cloneNode(true));
 
     this.#header = shadowRoot.querySelector("#header");
+    this.#menu = shadowRoot.querySelector(".menu");
     this.#toggleFullScreen =
       this.#header?.querySelector("#toggle-fullscreen") ?? null;
+    this.#toggleMenuButton = shadowRoot.querySelector("#toggle-menu");
   }
 
   connectedCallback() {
     this.#toggleFullScreen?.addEventListener(
       "click",
-      this._onToggleFullscreenButtonClick
+      this.#onToggleFullscreenButtonClick
     );
+    this.#toggleMenuButton?.addEventListener("click", this.#onMenuButtonClick);
   }
 
   disconnectedCallback() {
     this.#toggleFullScreen?.removeEventListener(
       "click",
-      this._onToggleFullscreenButtonClick
+      this.#onToggleFullscreenButtonClick
+    );
+    this.#toggleMenuButton?.removeEventListener(
+      "click",
+      this.#onMenuButtonClick
     );
   }
 
-  _onToggleFullscreenButtonClick = () => {
+  #onToggleFullscreenButtonClick = () => {
     if (!this.hasAttribute("fullscreen")) {
       this.setAttribute("fullscreen", "");
     } else {
       this.removeAttribute("fullscreen");
     }
+  };
+
+  #onMenuButtonClick = () => {
+    this.#menu?.classList.toggle("open");
+    this.#toggleMenuButton?.classList.toggle("active");
   };
 }
