@@ -1,7 +1,7 @@
 // @ts-check
 
 import { VscodeDemo } from "./demo.js";
-import { VscodeDevToolbar } from "./toolbar.js";
+import { VscodeDevToolbar } from "./dev-toolbar.js";
 import { VscodeThemeSelector } from "./theme-selector.js";
 import { VscodeToggleMotion } from "./toggle-motion.js";
 import { VscodeToggleUnderline } from "./toggle-underline.js";
