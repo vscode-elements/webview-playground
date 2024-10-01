@@ -4,8 +4,8 @@ const html = String.raw;
 const css = String.raw;
 
 const DEFAULT_STYLES_ID = "_defaultStyles";
-const ATTR_SHOW_UI = "show-ui";
-const STORAGE_KEY_SHOW_UI = "vscode-playground:show-dev-toolbar-ui";
+const ATTR_HIDDEN = "hidden";
+const STORAGE_KEY_HIDE_UI = "vscode-playground:dev-toolbar-hidden";
 
 function getDefaultStylesCSS() {
   return css`
@@ -125,11 +125,11 @@ function getComponentTemplate() {
       }
 
       .ui {
-        display: none;
+        display: block;
       }
 
-      .ui.show {
-        display: block;
+      .ui.hidden {
+        display: none;
       }
 
       label {
@@ -287,7 +287,7 @@ function getComponentTemplate() {
 }
 
 export class VscodeDevToolbar extends HTMLElement {
-  static observedAttributes = [ATTR_SHOW_UI];
+  static observedAttributes = [ATTR_HIDDEN];
 
   /** @type {HTMLTemplateElement} */
   static template;
@@ -335,14 +335,7 @@ export class VscodeDevToolbar extends HTMLElement {
     );
 
     this._applyDefaultStyles();
-
-    const savedUiState = localStorage.getItem(STORAGE_KEY_SHOW_UI);
-
-    if (savedUiState === null) {
-      this._showUi(true);
-    } else {
-      this._showUi(savedUiState === "true");
-    }
+    this._hideUi(localStorage.getItem(STORAGE_KEY_HIDE_UI) === "true");
   }
 
   disconnectedCallback() {
@@ -363,39 +356,33 @@ export class VscodeDevToolbar extends HTMLElement {
    * @param {string} _newValue
    */
   attributeChangedCallback(name, _oldValue, _newValue) {
-    if (name === ATTR_SHOW_UI) {
-      this._showUi(this.hasAttribute(ATTR_SHOW_UI));
+    if (name === ATTR_HIDDEN) {
+      this._hideUi(this.hasAttribute(ATTR_HIDDEN));
     }
   }
 
-  // TODO: should be hide ui instead
-  /** @param {boolean} force */
-  set showUi(force) {
-    if (Boolean(force)) {
-      this.setAttribute(ATTR_SHOW_UI, "");
+  /** @param {boolean} hide */
+  set hidden(hide) {
+    if (Boolean(hide)) {
+      this.setAttribute(ATTR_HIDDEN, "");
     } else {
-      this.removeAttribute(ATTR_SHOW_UI);
+      this.removeAttribute(ATTR_HIDDEN);
     }
 
-    this._showUi(Boolean(force));
+    this._hideUi(Boolean(hide));
   }
 
   /** @returns {boolean} */
-  get showUi() {
-    return this.hasAttribute(ATTR_SHOW_UI);
+  get hidden() {
+    return this.hasAttribute(ATTR_HIDDEN);
   }
 
-  /** @param {boolean} force */
-  _showUi(force) {
+  /** @param {boolean} hide */
+  _hideUi(hide) {
     const ui = this.shadowRoot?.querySelector(".ui");
 
-    if (force) {
-      ui?.classList.add("show");
-    } else {
-      ui?.classList.remove("show");
-    }
-
-    localStorage.setItem(STORAGE_KEY_SHOW_UI, force.toString());
+    ui?.classList.toggle("hidden", hide);
+    localStorage.setItem(STORAGE_KEY_HIDE_UI, hide.toString());
   }
 
   _applyDefaultStyles() {
