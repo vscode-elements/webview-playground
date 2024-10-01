@@ -121,6 +121,7 @@ function getComponentTemplate() {
         font-size: 14px;
         position: fixed;
         right: 30px;
+        z-index: 1000;
       }
 
       .ui {
@@ -191,14 +192,15 @@ function getComponentTemplate() {
         padding: 10px;
       }
 
+      vscode-toggle-underline::part(checkbox),
+      vscode-toggle-motion::part(checkbox) {
+        margin-top: 0;
+      }
+
       .row {
         align-items: center;
         display: flex;
-        margin: 10px 0;
-      }
-
-      .row:first-child {
-        margin-top: 0;
+        margin: 0 0 10px;
       }
 
       .row:last-child {
@@ -252,17 +254,10 @@ function getComponentTemplate() {
           <legend>User preferences</legend>
           <div>
             <div class="row">
-              <input type="checkbox" id="toggle-underline" />
-              <label for="toggle-underline"
-                >Underline links
-                <span>(accessibility.underlineLinks)</span></label
-              >
+              <vscode-toggle-underline></vscode-toggle-underline>
             </div>
             <div class="row">
-              <input type="checkbox" id="toggle-reduce-motion" />
-              <label for="toggle-reduce-motion"
-                >Reduce motion <span>(workbench.reduceMotion)</span></label
-              >
+              <vscode-toggle-motion></vscode-toggle-motion>
             </div>
           </div>
         </fieldset>
@@ -373,6 +368,7 @@ export class VscodeDevToolbar extends HTMLElement {
     }
   }
 
+  // TODO: should be hide ui instead
   /** @param {boolean} force */
   set showUi(force) {
     if (Boolean(force)) {

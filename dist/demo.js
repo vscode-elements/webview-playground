@@ -50,11 +50,12 @@ function getComponentTemplate() {
         background-color: var(--toolbar-background, #fff);
         box-sizing: border-box;
         display: flex;
+        font-family: var(--vscode-font-family, sans-serif);
+        font-size: 13px;
         flex-wrap: wrap;
         padding: 10px;
         position: relative;
         width: 100%;
-        z-index: 2;
       }
 
       .header:after {
@@ -108,12 +109,28 @@ function getComponentTemplate() {
         padding: 10px;
         position: absolute;
         top: 24px;
-        width: 200px;
-        z-index: 3;
+        z-index: 100;
       }
 
       .menu.open {
         display: block;
+      }
+
+      fieldset {
+        border: 1px solid #e7e7e7;
+        border-radius: 5px;
+        margin-top: 5px;
+        padding: 10px;
+      }
+
+      .row {
+        align-items: center;
+        display: flex;
+        margin: 0 0 10px 0;
+      }
+
+      .row:last-child {
+        margin-bottom: 0;
       }
 
       .header .toggle-fullscreen-button {
@@ -173,6 +190,15 @@ function getComponentTemplate() {
           </button>
           <div class="menu">
             <vscode-view-container-selector></vscode-view-container-selector>
+            <fieldset>
+              <legend>User preferences</legend>
+              <div class="row">
+                <vscode-toggle-underline></vscode-toggle-underline>
+              </div>
+              <div class="row">
+                <vscode-toggle-motion></vscode-toggle-motion>
+              </div>
+            </fieldset>
           </div>
         </div>
         <button
