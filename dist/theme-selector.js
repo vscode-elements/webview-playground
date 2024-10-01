@@ -1,5 +1,7 @@
 // @ts-check
 
+import { STORAGE_KEY_UNDERLINE } from "./toggle-underline.js";
+
 /**
  * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
  *
@@ -238,14 +240,7 @@ export class VscodeThemeSelector extends HTMLElement {
       VscodeThemeSelector.themes[themeId] || {};
 
     if (VscodeThemeSelector.themes[themeId].data) {
-      document.documentElement.setAttribute(
-        "style",
-        VscodeThemeSelector.themes[themeId].data
-      );
-      document.documentElement.style.setProperty(
-        "--vscode-font-family",
-        this.#getDefaultFontStack()
-      );
+      this.#setStyles(themeId);
       return;
     }
 
@@ -256,14 +251,7 @@ export class VscodeThemeSelector extends HTMLElement {
 
       VscodeThemeSelector.themes[themeId].isFetching = false;
       VscodeThemeSelector.themes[themeId].data = theme;
-      document.documentElement.setAttribute(
-        "style",
-        VscodeThemeSelector.themes[themeId].data ?? ""
-      );
-      document.documentElement.style.setProperty(
-        "--vscode-font-family",
-        this.#getDefaultFontStack()
-      );
+      this.#setStyles(themeId);
     }
 
     localStorage.setItem(STORAGE_KEY_THEME, themeId);
@@ -279,6 +267,27 @@ export class VscodeThemeSelector extends HTMLElement {
     } else {
       return "sans-serif";
     }
+  }
+
+  #getTextLinkDecoration() {
+    const underline = localStorage.getItem(STORAGE_KEY_UNDERLINE) === "true";
+    return underline ? "underline" : "none";
+  }
+
+  /** @param {ThemeId} themeId */
+  #setStyles(themeId) {
+    document.documentElement.setAttribute(
+      "style",
+      VscodeThemeSelector.themes[themeId].data ?? ""
+    );
+    document.documentElement.style.setProperty(
+      "--vscode-font-family",
+      this.#getDefaultFontStack()
+    );
+    document.documentElement.style.setProperty(
+      "--text-link-decoration",
+      this.#getTextLinkDecoration()
+    );
   }
 
   #getInitialTheme() {
