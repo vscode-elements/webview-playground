@@ -2,8 +2,8 @@
   "name": "@vscode-elements/webview-playground",
   "version": "1.0.0",
   "description": "Handy web components for emulating the VSCode Webview environment.",
-  "main": "index.js",
-  "module": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "files": [
     "dist"
   ],
