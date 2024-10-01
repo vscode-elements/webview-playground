@@ -1,14 +1,17 @@
 {
-  "name": "vscode-webview-playground",
+  "name": "@vscode-elements/webview-playground",
   "version": "1.0.0",
-  "description": "A web component to provide styles available in VSCode Webview.",
+  "description": "Handy web components for emulating the VSCode Webview environment.",
   "main": "index.js",
   "module": "index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "serve"
   },
-  "author": "",
+  "author": "Adam Bender <szoftverhiba@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "serve": "^14.2.3"

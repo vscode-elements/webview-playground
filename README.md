@@ -1,6 +1,6 @@
 # VSCode Webview Playground
 
-Handy web components to emulate the VSCode Webview environment.
+Handy web components for emulating the VSCode Webview environment.
 
 ## Installation
 
