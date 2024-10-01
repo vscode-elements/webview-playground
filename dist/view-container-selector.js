@@ -4,11 +4,9 @@
  * @typedef {"editor" | "sidebar" | "panel"} ViewContainer
  */
 
-import { STORAGE_KEY_PREFIX } from "./shared.js";
-
 const html = String.raw;
 
-const STORAGE_KEY_VIEW_CONTAINER = `${STORAGE_KEY_PREFIX}_view-container`;
+const STORAGE_KEY_VIEW_CONTAINER = "vscode-view-container-selector_view-container";
 
 function getComponentTemplate() {
   return html`

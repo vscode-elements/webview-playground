@@ -1,7 +1,5 @@
 // @ts-check
 
-import { STORAGE_KEY_PREFIX } from "./shared.js";
-
 /**
  * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
  *
@@ -21,7 +19,7 @@ import { STORAGE_KEY_PREFIX } from "./shared.js";
 
 const html = String.raw;
 
-export const STORAGE_KEY_THEME = `${STORAGE_KEY_PREFIX}_theme`;
+export const STORAGE_KEY_THEME = "vscode-theme-selector_theme";
 
 /**
  * @param {ThemeInfo} themeInfo
