@@ -5,12 +5,10 @@
  *
  * @typedef  ThemeInfoItem
  * @type {object}
- * @property {string} themeKind - Theme kind.
- * @property {string[]} bodyClasses - Classes added to body.
- * @property {string} name - Theme short name.
- * @property {string=} longName - Detailed name of theme.
- * @property {string} label - Theme switcher button label.
- * @property {string} description - Theme description.
+ * @property {string} themeKind - Theme kind.//
+ * @property {string[]} bodyClasses - Classes added to body.//
+ * @property {string} name - Theme short name.//
+ * @property {string=} longName - Detailed name of theme.//
  *
  * @typedef {Record<ThemeId, ThemeInfoItem>} ThemeInfo
  *
@@ -71,48 +69,36 @@ export class VscodeThemeSelector extends HTMLElement {
       bodyClasses: ["vscode-light"],
       name: "Light+",
       longName: "Default Light+",
-      label: "Light",
-      description: "Default light theme before April 2023 (version 1.78)",
     },
     "light-v2": {
       themeKind: "vscode-light",
       bodyClasses: ["vscode-light"],
       name: "Light Modern",
       longName: "Default Light Modern",
-      label: "Light v2",
-      description: "Default light theme since April 2023 (version 1.78)",
     },
     dark: {
       themeKind: "vscode-dark",
       bodyClasses: ["vscode-dark"],
       name: "Dark+",
       longName: "Default Dark+",
-      label: "Dark",
-      description: "Default dark theme before April 2023 (version 1.78)",
     },
     "dark-v2": {
       themeKind: "vscode-dark",
       bodyClasses: ["vscode-dark"],
       name: "Dark Modern",
       longName: "Default Dark Modern",
-      label: "Dark v2",
-      description: "Default dark theme since April 2023 (version 1.78)",
     },
     "hc-light": {
       themeKind: "vscode-high-contrast-light",
       bodyClasses: ["vscode-high-contrast-light", "vscode-high-contrast"],
       name: "Light High Contrast",
       longName: "Default High Contrast Light",
-      label: "HC Light",
-      description: "Light High Contrast theme",
     },
     "hc-dark": {
       themeKind: "vscode-high-contrast",
       bodyClasses: ["vscode-high-contrast"],
       name: "Dark High Contrast",
       longName: "Default High Contrast",
-      label: "HC Dark",
-      description: "Dark High Contrast theme",
     },
   };
   /** @type {string} */
