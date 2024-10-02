@@ -7,22 +7,23 @@ To list all webview theme variables:
 
 ```javascript
 (function () {
-  const consoleMsg = Array.from(document.documentElement.style)
+  const mapper = (s) => {
+    const k = s.replace(/\./g,"\\.");
+    const v = document.documentElement.style.getPropertyValue(s);
+    const p = `${s.replace(/\./g,"\\.")}: ${document.documentElement.style.getPropertyValue(s)}`;
+    return `  ["${k}", "${v}"],\n`;
+  }
+  const list = Array.from(document.documentElement.style)
     .sort((a, b) => a.localeCompare(b))
-    .map(
-      (s) =>
-        `${s.replace(
-          /\./g,
-          "\\."
-        )}: ${document.documentElement.style.getPropertyValue(s)};\n`
-    )
     .filter(
       (v) =>
         v.indexOf("--vscode-font-family") === -1 &&
         v.indexOf("--text-link-decoration") === -1
     )
+    .map(mapper)
     .join("");
+  const res = `export const theme = [\n${list}];\n`
 
-  console.log(consoleMsg);
+  console.log(res);
 })();
 ```
