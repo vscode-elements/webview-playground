@@ -1,7 +1,5 @@
 // @ts-check
 
-import { STORAGE_KEY_UNDERLINE } from "./toggle-underline.js";
-
 /**
  * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
  *
@@ -242,8 +240,7 @@ export class VscodeThemeSelector extends HTMLElement {
 
     if (!VscodeThemeSelector.themes[themeId].isFetching) {
       VscodeThemeSelector.themes[themeId].isFetching = true;
-
-      // const theme = await this.#fetchTheme(themeId);
+      
       const { theme } =
         await /** @type {Promise<{theme: [string, string][]}>} */ (
           import(`./themes/${themeId}.js`)
@@ -269,11 +266,6 @@ export class VscodeThemeSelector extends HTMLElement {
     }
   }
 
-  #getTextLinkDecoration() {
-    const underline = localStorage.getItem(STORAGE_KEY_UNDERLINE) === "true";
-    return underline ? "underline" : "none";
-  }
-
   /** @param {ThemeId} themeId */
   #setStyles(themeId) {
     if (VscodeThemeSelector.themes[themeId].data) {
@@ -285,10 +277,6 @@ export class VscodeThemeSelector extends HTMLElement {
     document.documentElement.style.setProperty(
       "--vscode-font-family",
       this.#getDefaultFontStack()
-    );
-    document.documentElement.style.setProperty(
-      "--text-link-decoration",
-      this.#getTextLinkDecoration()
     );
   }
 
