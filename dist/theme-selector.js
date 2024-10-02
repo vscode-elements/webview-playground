@@ -1,14 +1,14 @@
 // @ts-check
 
 /**
- * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark" } ThemeId
+ * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark"} ThemeId
+ * @typedef {"vscode-light" | "vscode-dark" | "vscode-high-contrast" | "vscode-high-contrast-light"} ThemeKind
  *
  * @typedef  ThemeInfoItem
  * @type {object}
- * @property {string} themeKind - Theme kind.//
- * @property {string[]} bodyClasses - Classes added to body.//
- * @property {string} name - Theme short name.//
- * @property {string=} longName - Detailed name of theme.//
+ * @property {ThemeKind} themeKind - Theme kind.
+ * @property {string} name - Theme short name.
+ * @property {string=} longName - Detailed name of theme.
  *
  * @typedef {Record<ThemeId, ThemeInfoItem>} ThemeInfo
  *
@@ -66,37 +66,31 @@ export class VscodeThemeSelector extends HTMLElement {
   static themeInfo = {
     light: {
       themeKind: "vscode-light",
-      bodyClasses: ["vscode-light"],
       name: "Light+",
       longName: "Default Light+",
     },
     "light-v2": {
       themeKind: "vscode-light",
-      bodyClasses: ["vscode-light"],
       name: "Light Modern",
       longName: "Default Light Modern",
     },
     dark: {
       themeKind: "vscode-dark",
-      bodyClasses: ["vscode-dark"],
       name: "Dark+",
       longName: "Default Dark+",
     },
     "dark-v2": {
       themeKind: "vscode-dark",
-      bodyClasses: ["vscode-dark"],
       name: "Dark Modern",
       longName: "Default Dark Modern",
     },
     "hc-light": {
       themeKind: "vscode-high-contrast-light",
-      bodyClasses: ["vscode-high-contrast-light", "vscode-high-contrast"],
       name: "Light High Contrast",
       longName: "Default High Contrast Light",
     },
     "hc-dark": {
       themeKind: "vscode-high-contrast",
-      bodyClasses: ["vscode-high-contrast"],
       name: "Dark High Contrast",
       longName: "Default High Contrast",
     },
@@ -173,32 +167,25 @@ export class VscodeThemeSelector extends HTMLElement {
         document.documentElement.style.removeProperty(p[0]);
       }
     );
-
     VscodeThemeSelector.appliedTheme = themeId;
 
-    const themeKeys = /** @type {ThemeId[]} */ (
-      Object.keys(VscodeThemeSelector.themeInfo)
+    const { themeKind, name, longName } =
+      VscodeThemeSelector.themeInfo[themeId];
+    const bodyClasses =
+      themeKind === "vscode-high-contrast-light"
+        ? ["vscode-high-contrast", "vscode-high-contrast-light"]
+        : [themeKind];
+
+    document.body.classList.remove(
+      "vscode-light",
+      "vscode-dark",
+      "vscode-high-contrast",
+      "vscode-high-contrast-light"
     );
-    const allAvailableBodyClasses = [];
-
-    themeKeys.forEach((t) => {
-      VscodeThemeSelector.themeInfo[t].bodyClasses.forEach((tk) => {
-        allAvailableBodyClasses.push(tk);
-      });
-    });
-
-    const uniqBodyClasses = [...new Set(allAvailableBodyClasses)];
-
-    document.body.classList.remove(...uniqBodyClasses);
-    document.body.classList.add(
-      ...VscodeThemeSelector.themeInfo[themeId].bodyClasses
-    );
-    document.body.dataset.vscodeThemeKind =
-      VscodeThemeSelector.themeInfo[themeId].themeKind;
-    document.body.dataset.vscodeThemeName =
-      VscodeThemeSelector.themeInfo[themeId].name;
-    document.body.dataset.vscodeThemeId =
-      VscodeThemeSelector.themeInfo[themeId].longName;
+    document.body.classList.add(...bodyClasses);
+    document.body.dataset.vscodeThemeKind = themeKind;
+    document.body.dataset.vscodeThemeName = name;
+    document.body.dataset.vscodeThemeId = longName;
 
     VscodeThemeSelector.themes[themeId] =
       VscodeThemeSelector.themes[themeId] || {};
@@ -210,7 +197,7 @@ export class VscodeThemeSelector extends HTMLElement {
 
     if (!VscodeThemeSelector.themes[themeId].isFetching) {
       VscodeThemeSelector.themes[themeId].isFetching = true;
-      
+
       const { theme } =
         await /** @type {Promise<{theme: [string, string][]}>} */ (
           import(`./themes/${themeId}.js`)
