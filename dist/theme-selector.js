@@ -16,7 +16,7 @@ import { STORAGE_KEY_UNDERLINE } from "./toggle-underline.js";
  *
  * @typedef {Record<ThemeId, ThemeInfoItem>} ThemeInfo
  *
- * @typedef {Record<ThemeId, {data?: string; isFetching?: boolean;}>} ThemeRegistry
+ * @typedef {Record<ThemeId, {data?: [string, string][]; isFetching?: boolean;}>} ThemeRegistry
  */
 
 const html = String.raw;
@@ -195,20 +195,16 @@ export class VscodeThemeSelector extends HTMLElement {
   /**
    * @param {ThemeId} themeId
    */
-  async #fetchTheme(themeId) {
-    const res = await fetch(`${this.#getDirectoryUrl()}/${themeId}.txt`);
-    const theme = await res.text();
-
-    return theme;
-  }
-
-  /**
-   * @param {ThemeId} themeId
-   */
   async #applyTheme(themeId) {
     if (themeId === VscodeThemeSelector.appliedTheme) {
       return;
     }
+
+    VscodeThemeSelector.themes[VscodeThemeSelector.appliedTheme]?.data?.forEach(
+      (p) => {
+        document.documentElement.style.removeProperty(p[0]);
+      }
+    );
 
     VscodeThemeSelector.appliedTheme = themeId;
 
@@ -247,7 +243,11 @@ export class VscodeThemeSelector extends HTMLElement {
     if (!VscodeThemeSelector.themes[themeId].isFetching) {
       VscodeThemeSelector.themes[themeId].isFetching = true;
 
-      const theme = await this.#fetchTheme(themeId);
+      // const theme = await this.#fetchTheme(themeId);
+      const { theme } =
+        await /** @type {Promise<{theme: [string, string][]}>} */ (
+          import(`./themes/${themeId}.js`)
+        );
 
       VscodeThemeSelector.themes[themeId].isFetching = false;
       VscodeThemeSelector.themes[themeId].data = theme;
@@ -276,10 +276,12 @@ export class VscodeThemeSelector extends HTMLElement {
 
   /** @param {ThemeId} themeId */
   #setStyles(themeId) {
-    document.documentElement.setAttribute(
-      "style",
-      VscodeThemeSelector.themes[themeId].data ?? ""
-    );
+    if (VscodeThemeSelector.themes[themeId].data) {
+      VscodeThemeSelector.themes[themeId].data.forEach((p) => {
+        document.documentElement.style.setProperty(p[0], p[1]);
+      });
+    }
+
     document.documentElement.style.setProperty(
       "--vscode-font-family",
       this.#getDefaultFontStack()
