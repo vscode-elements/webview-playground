@@ -178,18 +178,6 @@ export class VscodeThemeSelector extends HTMLElement {
     this.#dropdown.disabled = force;
   }
 
-  #getDirectoryUrl() {
-    if (VscodeThemeSelector.directoryUrl) {
-      return VscodeThemeSelector.directoryUrl;
-    }
-
-    const urlParts = import.meta.url.split("/");
-    urlParts.pop();
-    VscodeThemeSelector.directoryUrl = urlParts.join("/");
-
-    return VscodeThemeSelector.directoryUrl;
-  }
-
   /**
    * @param {ThemeId} themeId
    */
