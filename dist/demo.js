@@ -188,7 +188,7 @@ function getComponentTemplate() {
               />
             </svg>
           </button>
-          <div class="menu">
+          <div id="menu" class="menu">
             <vscode-view-container-selector></vscode-view-container-selector>
             <fieldset>
               <legend>User preferences</legend>
@@ -298,8 +298,34 @@ export class VscodeDemo extends HTMLElement {
     }
   };
 
-  #onMenuButtonClick = () => {
-    this.#menu?.classList.toggle("open");
-    this.#toggleMenuButton?.classList.toggle("active");
+  /** @param {MouseEvent} ev */
+  #onMenuButtonClick = (ev) => {
+    ev.stopPropagation();
+
+    if (this.#menu?.classList.contains("open")) {
+      this.#menu?.classList.toggle("open", false);
+      this.#toggleMenuButton?.classList.toggle("active", false);
+      window.removeEventListener("click", this.#onDocumentClick);
+    } else {
+      this.#menu?.classList.toggle("open", true);
+      this.#toggleMenuButton?.classList.toggle("active", true);
+      window.addEventListener("click", this.#onDocumentClick);
+    }
+  };
+
+  /** @param {MouseEvent} ev */
+  #onDocumentClick = (ev) => {
+    if (ev.target) {
+      const path = ev.composedPath();
+      const menuClicked = !!path.find((e) => e === this.#menu);
+      const buttonClicked = !!path.find((e) => e === this.#toggleMenuButton);
+
+      if (!menuClicked || buttonClicked) {
+        ev.stopPropagation();
+        this.#menu?.classList.toggle("open", false);
+        this.#toggleMenuButton?.classList.toggle("active", false);
+        window.removeEventListener("click", this.#onDocumentClick);
+      }
+    }
   };
 }
