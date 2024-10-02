@@ -24,7 +24,7 @@ function getComponentTemplate() {
 
       .canvas {
         all: initial;
-        background-color: var(--vscode-editor-background);
+        background-color: var(--playground-body-background);
         color: var(--vscode-foreground);
         display: block;
         font-family: var(--vscode-font-family);
