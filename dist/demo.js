@@ -305,16 +305,16 @@ export class VscodeDemo extends HTMLElement {
     if (this.#menu?.classList.contains("open")) {
       this.#menu?.classList.toggle("open", false);
       this.#toggleMenuButton?.classList.toggle("active", false);
-      window.removeEventListener("click", this.#onDocumentClick);
+      window.removeEventListener("click", this.#onWindowClick);
     } else {
       this.#menu?.classList.toggle("open", true);
       this.#toggleMenuButton?.classList.toggle("active", true);
-      window.addEventListener("click", this.#onDocumentClick);
+      window.addEventListener("click", this.#onWindowClick);
     }
   };
 
   /** @param {MouseEvent} ev */
-  #onDocumentClick = (ev) => {
+  #onWindowClick = (ev) => {
     if (ev.target) {
       const path = ev.composedPath();
       const menuClicked = !!path.find((e) => e === this.#menu);
@@ -324,7 +324,7 @@ export class VscodeDemo extends HTMLElement {
         ev.stopPropagation();
         this.#menu?.classList.toggle("open", false);
         this.#toggleMenuButton?.classList.toggle("active", false);
-        window.removeEventListener("click", this.#onDocumentClick);
+        window.removeEventListener("click", this.#onWindowClick);
       }
     }
   };
