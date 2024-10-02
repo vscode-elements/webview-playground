@@ -328,24 +328,24 @@ export class VscodeDevToolbar extends HTMLElement {
       this.shadowRoot?.querySelector(".panel")
     );
 
-    this._openButton?.addEventListener("click", this._onOpenToolbarButtonClick);
+    this._openButton?.addEventListener("click", this.#onOpenToolbarButtonClick);
     this._closeButton?.addEventListener(
       "click",
-      this._onCloseToolbarButtonClick
+      this.#onCloseToolbarButtonClick
     );
 
-    this._applyDefaultStyles();
-    this._hideUi(localStorage.getItem(STORAGE_KEY_HIDE_UI) === "true");
+    this.#applyDefaultStyles();
+    this.#hideUi(localStorage.getItem(STORAGE_KEY_HIDE_UI) === "true");
   }
 
   disconnectedCallback() {
     this._openButton?.removeEventListener(
       "click",
-      this._onOpenToolbarButtonClick
+      this.#onOpenToolbarButtonClick
     );
     this._closeButton?.removeEventListener(
       "click",
-      this._onCloseToolbarButtonClick
+      this.#onCloseToolbarButtonClick
     );
   }
 
@@ -357,7 +357,7 @@ export class VscodeDevToolbar extends HTMLElement {
    */
   attributeChangedCallback(name, _oldValue, _newValue) {
     if (name === ATTR_HIDDEN) {
-      this._hideUi(this.hasAttribute(ATTR_HIDDEN));
+      this.#hideUi(this.hasAttribute(ATTR_HIDDEN));
     }
   }
 
@@ -369,7 +369,7 @@ export class VscodeDevToolbar extends HTMLElement {
       this.removeAttribute(ATTR_HIDDEN);
     }
 
-    this._hideUi(Boolean(hide));
+    this.#hideUi(Boolean(hide));
   }
 
   /** @returns {boolean} */
@@ -378,14 +378,14 @@ export class VscodeDevToolbar extends HTMLElement {
   }
 
   /** @param {boolean} hide */
-  _hideUi(hide) {
+  #hideUi(hide) {
     const ui = this.shadowRoot?.querySelector(".ui");
 
     ui?.classList.toggle("hidden", hide);
     localStorage.setItem(STORAGE_KEY_HIDE_UI, hide.toString());
   }
 
-  _applyDefaultStyles() {
+  #applyDefaultStyles() {
     const defaultStyles = document.getElementById(DEFAULT_STYLES_ID);
 
     if (!defaultStyles) {
@@ -396,12 +396,12 @@ export class VscodeDevToolbar extends HTMLElement {
     }
   }
 
-  _onOpenToolbarButtonClick = () => {
+  #onOpenToolbarButtonClick = () => {
     this._panel?.classList.add("open");
     this._openButton?.classList.add("open");
   };
 
-  _onCloseToolbarButtonClick = () => {
+  #onCloseToolbarButtonClick = () => {
     this._panel?.classList.remove("open");
     this._openButton?.classList.remove("open");
   };
