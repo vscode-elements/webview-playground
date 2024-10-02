@@ -396,13 +396,31 @@ export class VscodeDevToolbar extends HTMLElement {
     }
   }
 
-  #onOpenToolbarButtonClick = () => {
+  /** @param {MouseEvent} ev */
+  #onOpenToolbarButtonClick = (ev) => {
+    ev.stopPropagation();
     this._panel?.classList.add("open");
     this._openButton?.classList.add("open");
+    window.addEventListener("click", this.#onWindowClick);
   };
 
   #onCloseToolbarButtonClick = () => {
     this._panel?.classList.remove("open");
     this._openButton?.classList.remove("open");
+    window.removeEventListener("click", this.#onWindowClick);
+  };
+
+  /** @param {MouseEvent} ev */
+  #onWindowClick = (ev) => {
+    if (ev.target) {
+      const path = ev.composedPath();
+      const panelClicked = path.find((e) => e === this._panel);
+
+      if (!panelClicked) {
+        this._panel?.classList.remove("open");
+        this._openButton?.classList.remove("open");
+        window.removeEventListener("click", this.#onWindowClick);
+      }
+    }
   };
 }
