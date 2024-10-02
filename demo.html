@@ -5,10 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="module" src="/dist/index.js"></script>
   <title>VSCode Webview Playground</title>
+  <style>
+    .badge {
+      background-color: var(--vscode-badge-background);
+      border: 1px solid var(--vscode-contrastBorder, transparent);
+      border-radius: 2px;
+      box-sizing: border-box;
+      color: var(--vscode-badge-foreground);
+      display: inline-block;
+      font-family: var(--vscode-font-family);
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 14px;
+      min-width: 18px;
+      padding: 2px 3px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .badge.counter {
+      border-radius: 11px;
+      box-sizing: border-box;
+      height: 18px;
+      line-height: 1;
+      padding: 3px 5px;
+    }
+
+    .badge.activity-bar-counter {
+      background-color: var(--vscode-activityBarBadge-background);
+      border-radius: 20px;
+      color: var(--vscode-activityBarBadge-foreground);
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 16px;
+      padding: 0 4px;
+    }
+  </style>
 </head>
 <body>
-  <vscode-dev-toolbar></vscode-dev-toolbar>
-  
+  <vscode-demo>
+    <span class="badge">308 Settings Found</span>
+  </vscode-demo>
+  <vscode-demo>
+    <span class="badge counter">42</span>
+  </vscode-demo>
+  <vscode-demo>
+    <span class="badge activity-bar-counter">42</span>
+  </vscode-demo>
+
   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <pre><code>npm install lipsum</code></pre> Ut finibus imperdiet nisl. <a href="#">Nunc vel nisl a felis pretium venenatis quis vel mauris.</a> Mauris eget urna gravida, tincidunt arcu at, volutpat felis. Integer quis diam ut dui aliquam viverra. Proin ex sem, euismod in dui nec, tincidunt auctor sem. Nunc vel leo non mi lobortis vulputate. Aenean cursus libero ligula, at dignissim dui semper ut. Pellentesque porttitor euismod eleifend. Nam in condimentum tortor. In posuere metus orci, vel pretium ipsum rutrum dapibus. Nam dignissim sit amet leo a porta.</p>
   <p><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd></p>
   <blockquote>
@@ -17,6 +61,5 @@
     </p>
   </blockquote>
   <p>Pellentesque non sem mattis, auctor nisi in, lacinia diam. Aliquam erat volutpat. Suspendisse viverra ut nisl nec facilisis. Fusce congue purus quis libero eleifend lobortis. Morbi ullamcorper tortor sed dictum cursus. Nunc eget ante et ipsum euismod tempor nec quis augue. Maecenas sit amet vulputate justo, et elementum dolor. Aliquam erat volutpat.</p>
-
 </body>
 </html>
