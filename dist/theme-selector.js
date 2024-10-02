@@ -21,9 +21,7 @@ const html = String.raw;
 
 export const STORAGE_KEY_THEME = "vscode-playground:theme";
 
-/**
- * @param {ThemeInfo} themeInfo
- */
+/** @param {ThemeInfo} themeInfo */
 function getOptionsHTML(themeInfo) {
   let optionsMarkup = "";
   const themeIds = /** @type{ThemeId[]} */ (Object.keys(themeInfo));
@@ -178,9 +176,7 @@ export class VscodeThemeSelector extends HTMLElement {
     this.#dropdown.disabled = force;
   }
 
-  /**
-   * @param {ThemeId} themeId
-   */
+  /** @param {ThemeId} themeId */
   async #applyTheme(themeId) {
     if (themeId === VscodeThemeSelector.appliedTheme) {
       return;
@@ -291,9 +287,7 @@ export class VscodeThemeSelector extends HTMLElement {
     });
   }
 
-  /**
-   * @param {boolean} force
-   */
+  /** @param {boolean} force */
   #disableAllSelectors(force) {
     VscodeThemeSelector.instances.forEach((s) => {
       s.disableSelector(force);
