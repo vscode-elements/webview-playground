@@ -57,7 +57,8 @@ function getComponentTemplate() {
         font-family: var(--vscode-font-family, sans-serif);
         font-size: 13px;
         flex-wrap: wrap;
-        padding: 10px;
+        height: 35px;
+        padding: 0 10px;
         position: relative;
         width: 100%;
       }
