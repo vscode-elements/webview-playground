@@ -1,6 +1,10 @@
 // @ts-check
 
+import { getDefaultStylesCSS } from "./shared.js";
+
 const html = String.raw;
+
+const LIGHT_DOM_STYLE_ID = "_vscodeDemoStyles";
 
 function getComponentTemplate() {
   return html`
@@ -269,6 +273,7 @@ export class VscodeDemo extends HTMLElement {
     this.#toggleFullScreen =
       this.#header?.querySelector("#toggle-fullscreen") ?? null;
     this.#toggleMenuButton = shadowRoot.querySelector("#toggle-menu");
+    this.dataset.vscodeDemo = '';
   }
 
   connectedCallback() {
@@ -277,6 +282,7 @@ export class VscodeDemo extends HTMLElement {
       this.#onToggleFullscreenButtonClick
     );
     this.#toggleMenuButton?.addEventListener("click", this.#onMenuButtonClick);
+    this.#applyLightDomStyles();
   }
 
   disconnectedCallback() {
@@ -288,6 +294,15 @@ export class VscodeDemo extends HTMLElement {
       "click",
       this.#onMenuButtonClick
     );
+  }
+
+  #applyLightDomStyles() {
+    if (!document.getElementById(LIGHT_DOM_STYLE_ID)) {
+      const styleElement = document.createElement("style");
+      styleElement.setAttribute("id", LIGHT_DOM_STYLE_ID);
+      styleElement.innerHTML = getDefaultStylesCSS("vscode-demo[data-vscode-demo] ");
+      document.head.appendChild(styleElement);
+    }
   }
 
   #onToggleFullscreenButtonClick = () => {
@@ -305,16 +320,16 @@ export class VscodeDemo extends HTMLElement {
     if (this.#menu?.classList.contains("open")) {
       this.#menu?.classList.toggle("open", false);
       this.#toggleMenuButton?.classList.toggle("active", false);
-      window.removeEventListener("click", this.#onDocumentClick);
+      window.removeEventListener("click", this.#onWindowClick);
     } else {
       this.#menu?.classList.toggle("open", true);
       this.#toggleMenuButton?.classList.toggle("active", true);
-      window.addEventListener("click", this.#onDocumentClick);
+      window.addEventListener("click", this.#onWindowClick);
     }
   };
 
   /** @param {MouseEvent} ev */
-  #onDocumentClick = (ev) => {
+  #onWindowClick = (ev) => {
     if (ev.target) {
       const path = ev.composedPath();
       const menuClicked = !!path.find((e) => e === this.#menu);
@@ -324,7 +339,7 @@ export class VscodeDemo extends HTMLElement {
         ev.stopPropagation();
         this.#menu?.classList.toggle("open", false);
         this.#toggleMenuButton?.classList.toggle("active", false);
-        window.removeEventListener("click", this.#onDocumentClick);
+        window.removeEventListener("click", this.#onWindowClick);
       }
     }
   };
