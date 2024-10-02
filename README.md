@@ -19,7 +19,7 @@ They are pure JavaScript files, so no bundler is required. It’s up to you how 
 
 Insert theme variables and default styles into the page. It appears as a button in the lower right corner. When clicked, a simple toolbar is displayed.
 
-![Dev toolbar button](image.png)
+![Dev toolbar button](https://github.com/vscode-elements/webview-playground/raw/main/image.png)
 
 ```html
 <!DOCTYPE html>
@@ -45,7 +45,7 @@ document.querySelector('vscode-dev-toolbar').hidden = true;
 
 An isolated block intended for use in a documentation site, e.g., Storybook. It inserts the theme variables but doesn't modify the host page's styles.
 
-![alt text](image-1.png)
+![alt text](https://github.com/vscode-elements/webview-playground/raw/main/image-1.png)
 
 ```html
 <!DOCTYPE html>
