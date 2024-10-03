@@ -1,3 +1,4 @@
+/** @type {[string, string][]} */
 export const theme = [
   ["--vscode-actionBar-toggledBackground", "#dddddd"],
   ["--vscode-activityBar-activeBorder", "#005fb8"],

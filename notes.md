@@ -22,7 +22,8 @@ To list all webview theme variables:
     )
     .map(mapper)
     .join("");
-  const res = `export const theme = [\n${list}];\n`
+  let res = '/** @type {[string, string][]} */\n';
+  res += `export const theme = [\n${list}];\n`
 
   console.log(res);
 })();

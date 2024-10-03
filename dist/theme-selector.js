@@ -156,6 +156,29 @@ export class VscodeThemeSelector extends HTMLElement {
     this.#dropdown.disabled = force;
   }
 
+  /**
+   * @param {ThemeId} themeId
+   * @returns {Promise<{theme: [string, string][]}>}
+   */
+  async #loadThemeModule(themeId) {
+    switch (themeId) {
+      case "light":
+        return await import(`./themes/light.js`);
+      case "light-v2":
+        return await import(`./themes/light-v2.js`);
+      case "dark":
+        return await import(`./themes/dark.js`);
+      case "dark-v2":
+        return await import(`./themes/dark-v2.js`);
+      case "hc-dark":
+        return await import(`./themes/hc-dark.js`);
+      case "hc-light":
+        return await import(`./themes/hc-light.js`);
+      default:
+        return await import(`./themes/dark-v2.js`);
+    }
+  }
+
   /** @param {ThemeId} themeId */
   async #applyTheme(themeId) {
     if (themeId === VscodeThemeSelector.appliedTheme) {
@@ -198,13 +221,10 @@ export class VscodeThemeSelector extends HTMLElement {
     if (!VscodeThemeSelector.themes[themeId].isFetching) {
       VscodeThemeSelector.themes[themeId].isFetching = true;
 
-      const { theme } =
-        await /** @type {Promise<{theme: [string, string][]}>} */ (
-          import(`./themes/${themeId}.js`)
-        );
+      const module = await this.#loadThemeModule(themeId);
 
       VscodeThemeSelector.themes[themeId].isFetching = false;
-      VscodeThemeSelector.themes[themeId].data = theme;
+      VscodeThemeSelector.themes[themeId].data = module.theme;
       this.#setStyles(themeId);
     }
 
