@@ -81,6 +81,8 @@ export class VscodeViewContainerSelector extends HTMLElement {
     if (VscodeViewContainerSelector.appliedViewContainer !== viewContainer) {
       this.#setViewContainer(viewContainer);
     }
+
+    this.#select.value = viewContainer;
   }
 
   disconnectedCallback() {
