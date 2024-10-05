@@ -280,21 +280,11 @@ export class VscodeThemeSelector extends HTMLElement {
     });
   }
 
-  /** @param {boolean} force */
-  #disableAllSelectors(force) {
-    VscodeThemeSelector.instances.forEach((s) => {
-      s.disableSelector(force);
-    });
-  }
-
   #handleDropdownChange = () => {
     const theme = /** @type {ThemeId} */ (this.#dropdown.value);
 
-    this.#disableAllSelectors(true);
-
     this.#applyTheme(theme).then(() => {
       this.#syncInstances(theme);
-      this.#disableAllSelectors(false);
     });
   };
 }
