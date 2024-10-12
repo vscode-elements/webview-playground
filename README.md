@@ -70,3 +70,4 @@ Further "private" components:
 - &lt;vscode-theme-selector&gt;
 - &lt;vscode-toggle-motion&gt;
 - &lt;vscode-toggle-underline&gt;
+- &lt;vscode-view-container-selector&gt;
