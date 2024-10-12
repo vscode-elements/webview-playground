@@ -1,3 +1,5 @@
 .vscode/settings.json
 node_modules
 /vscode-elements-webview-playground-*.tgz
+*.d.ts
+*.map

@@ -2,18 +2,23 @@
   "name": "@vscode-elements/webview-playground",
   "version": "1.1.1",
   "description": "Handy web components for emulating the VSCode Webview environment.",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "./dist"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "serve"
+    "start": "serve",
+    "clean": "rimraf -g ./dist/**/*.d.ts?(.map)",
+    "build-types": "npm run clean && tsc"
   },
   "author": "Adam Bender <szoftverhiba@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "serve": "^14.2.3"
+    "rimraf": "^6.0.1",
+    "serve": "^14.2.3",
+    "typescript": "^5.6.3"
   }
 }
