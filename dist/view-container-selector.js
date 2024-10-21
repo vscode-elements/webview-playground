@@ -23,7 +23,15 @@ function getComponentTemplate() {
       }
 
       select {
+        background-color: var(--vscode-editor-background);
+        border: 1px solid var(--vscode-foreground);
+        color: var(--vscode-foreground);
         font-family: var(--vscode-font-family, sans-serif);
+      }
+
+      select:focus {
+        outline: 1px solid var(--vscode-focusBorder);
+        outline-offset: 1px;
       }
     </style>
     <label for="container-selector">View container</label>
