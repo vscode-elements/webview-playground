@@ -251,6 +251,18 @@ export class VscodeThemeSelector extends HTMLElement {
     }
   }
 
+  #getDefaultEditorFontStack() {
+    if (navigator.userAgent.indexOf("Linux") > -1) {
+      return '"Droid Sans Mono", "monospace", monospace';
+    } else if (navigator.userAgent.indexOf("Mac") > -1) {
+      return 'Menlo, Monaco, "Courier New", monospace';
+    } else if (navigator.userAgent.indexOf("Windows") > -1) {
+      return 'Consolas, "Courier New", monospace';
+    } else {
+      return "monospace";
+    }
+  }
+
   /** @param {ThemeId} themeId */
   #setStyles(themeId) {
     if (VscodeThemeSelector.themes[themeId].data) {
@@ -262,6 +274,10 @@ export class VscodeThemeSelector extends HTMLElement {
     document.documentElement.style.setProperty(
       "--vscode-font-family",
       this.#getDefaultFontStack()
+    );
+    document.documentElement.style.setProperty(
+      "--vscode-editor-font-family",
+      this.#getDefaultEditorFontStack()
     );
   }
 

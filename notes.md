@@ -18,6 +18,7 @@ To list all webview theme variables:
     .filter(
       (v) =>
         v.indexOf("--vscode-font-family") === -1 &&
+        v.indexOf("--vscode-editor-font-family") === -1 &&
         v.indexOf("--text-link-decoration") === -1
     )
     .map(mapper)
