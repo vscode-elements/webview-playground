@@ -112,7 +112,6 @@ export const theme = [
   ["--vscode-editor-findMatchHighlightBorder", "#006bbd"],
   ["--vscode-editor-findRangeHighlightBorder", "rgba(0, 107, 189, 0.4)"],
   ["--vscode-editor-focusedStackFrameHighlightBackground", "rgba(206, 231, 206, 0.45)"],
-  ["--vscode-editor-font-family", "Consolas, 'Courier New', monospace"],
   ["--vscode-editor-font-size", "14px"],
   ["--vscode-editor-font-weight", "normal"],
   ["--vscode-editor-foreground", "#292929"],

@@ -117,7 +117,6 @@ export const theme = [
   ["--vscode-editor-focusedStackFrameHighlightBackground", "rgba(206, 231, 206, 0.45)"],
   ["--vscode-editor-foldBackground", "rgba(173, 214, 255, 0.3)"],
   ["--vscode-editor-foldPlaceholderForeground", "#808080"],
-  ["--vscode-editor-font-family", "Consolas, 'Courier New', monospace"],
   ["--vscode-editor-font-size", "14px"],
   ["--vscode-editor-font-weight", "normal"],
   ["--vscode-editor-foreground", "#000000"],
