@@ -51,8 +51,9 @@ function getComponentTemplate() {
 
       .header {
         align-items: center;
-        background-color: var(--toolbar-background, #fff);
+        background-color: var(--playground-body-background);
         box-sizing: border-box;
+        color: var(--vscode-editor-foreground);
         display: flex;
         font-family: var(--vscode-font-family, sans-serif);
         font-size: 13px;
@@ -63,23 +64,6 @@ function getComponentTemplate() {
         width: 100%;
       }
 
-      .header:after {
-        background-color: var(--toolbar-normal, #24292e);
-        bottom: 0;
-        content: "";
-        display: block;
-        height: 1px;
-        left: 0;
-        opacity: 0.2;
-        pointer-events: none;
-        position: absolute;
-        width: 100%;
-      }
-
-      .header button:focus-visible span {
-        outline: 1px solid var(--toolbar-active, #007acc);
-      }
-
       .menu-wrapper {
         position: relative;
       }
@@ -87,15 +71,27 @@ function getComponentTemplate() {
       .toggle-menu-button {
         background-color: transparent;
         border: 0;
-        border-radius: 3px;
+        border-radius: 5px;
+        box-sizing: content-box;
+        color: var(--vscode-editor-foreground);
         cursor: pointer;
         display: block;
+        height: 16px;
         margin: 0 0 0 2px;
         padding: 3px;
+        width: 16px;
+      }
+
+      .toggle-menu-button:focus {
+        outline: 1px solid var(--vscode-focusBorder);
+      }
+
+      .toggle-menu-button:hover {
+        background-color: var(--vscode-toolbar-hoverBackground);
       }
 
       .toggle-menu-button.active {
-        background-color: rgba(166, 166, 166, 0.31);
+        background-color: var(--vscode-toolbar-activeBackground);
       }
 
       .toggle-menu-button svg {
@@ -109,6 +105,7 @@ function getComponentTemplate() {
         border: 1px solid #cdcdcd;
         border-radius: 3px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+        color: #000;
         display: none;
         left: 1px;
         padding: 10px;
@@ -142,7 +139,8 @@ function getComponentTemplate() {
         align-items: center;
         background-color: transparent;
         border: 0;
-        color: var(--toolbar-normal, #24292e);
+        border-radius: 5px;
+        color: var(--vscode-editor-foreground);
         cursor: pointer;
         display: flex;
         justify-content: center;
@@ -166,12 +164,12 @@ function getComponentTemplate() {
         outline: none;
       }
 
-      .header .toggle-fullscreen-button:focus-visible {
-        outline: 1px solid var(--toolbar-active, #007acc);
+      .header .toggle-fullscreen-button:focus {
+        outline: 1px solid var(--vscode-focusBorder);
       }
     </style>
     <div class="header-wrapper">
-      <div id="header" class="header">
+      <div id="header" class="header" part="header">
         <vscode-theme-selector></vscode-theme-selector>
         <div class="menu-wrapper">
           <button
@@ -179,6 +177,7 @@ function getComponentTemplate() {
             class="toggle-menu-button"
             id="toggle-menu"
             title="Open menu"
+            part="toggle-menu"
           >
             <svg
               width="16"
@@ -193,7 +192,7 @@ function getComponentTemplate() {
               />
             </svg>
           </button>
-          <div id="menu" class="menu">
+          <div id="menu" class="menu" part="menu">
             <vscode-view-container-selector></vscode-view-container-selector>
             <fieldset>
               <legend>User preferences</legend>
@@ -211,6 +210,7 @@ function getComponentTemplate() {
           class="toggle-fullscreen-button"
           id="toggle-fullscreen"
           title="toggle fullscreen"
+          part="toggle-fullscreen"
         >
           <svg
             width="16"
@@ -239,7 +239,7 @@ function getComponentTemplate() {
         </button>
       </div>
     </div>
-    <div class="canvas">
+    <div class="canvas" part="canvas">
       <slot></slot>
     </div>
   `;
@@ -274,7 +274,7 @@ export class VscodeDemo extends HTMLElement {
     this.#toggleFullScreen =
       this.#header?.querySelector("#toggle-fullscreen") ?? null;
     this.#toggleMenuButton = shadowRoot.querySelector("#toggle-menu");
-    this.dataset.vscodeDemo = '';
+    this.dataset.vscodeDemo = "";
   }
 
   connectedCallback() {
@@ -301,7 +301,9 @@ export class VscodeDemo extends HTMLElement {
     if (!document.getElementById(LIGHT_DOM_STYLE_ID)) {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("id", LIGHT_DOM_STYLE_ID);
-      styleElement.innerHTML = getDefaultStylesCSS("vscode-demo[data-vscode-demo] ");
+      styleElement.innerHTML = getDefaultStylesCSS(
+        "vscode-demo[data-vscode-demo] "
+      );
       document.head.appendChild(styleElement);
     }
   }
