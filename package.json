@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "serve",
     "dev": "serve",
-    "clean": "rimraf -g ./dist/**/*.d.ts?(.map)",
+    "clean": "rimraf -g \"./dist/**/*.d.ts?(.map)\" && rimraf -g \"vscode-elements-webview-playground-*.tgz\"",
     "build": "npm run clean && tsc"
   },
   "author": "Adam Bender <szoftverhiba@gmail.com>",
