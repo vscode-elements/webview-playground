@@ -189,6 +189,8 @@ export class VscodeThemeSelector extends HTMLElement {
 
   /** @param {ThemeId} themeId */
   async #applyTheme(themeId) {
+    localStorage.setItem(STORAGE_KEY_THEME, themeId);
+
     if (themeId === VscodeThemeSelector.appliedTheme) {
       return;
     }
@@ -235,8 +237,6 @@ export class VscodeThemeSelector extends HTMLElement {
       VscodeThemeSelector.themes[themeId].data = module.theme;
       this.#setStyles(themeId);
     }
-
-    localStorage.setItem(STORAGE_KEY_THEME, themeId);
   }
 
   #getDefaultFontStack() {
