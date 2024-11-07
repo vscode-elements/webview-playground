@@ -31,7 +31,6 @@ function getComponentTemplate() {
 
       select:focus {
         outline: 1px solid var(--vscode-focusBorder);
-        outline-offset: 1px;
       }
     </style>
     <label for="container-selector">View container</label>
