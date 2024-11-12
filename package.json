@@ -14,11 +14,14 @@
     "start": "serve",
     "dev": "serve",
     "clean": "rimraf -g \"./dist/**/*.d.ts?(.map)\" && rimraf -g \"vscode-elements-webview-playground-*.tgz\"",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "get-themes:dev": "nodemon scripts/get-themes.js"
   },
   "author": "Adam Bender <szoftverhiba@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "nodemon": "^3.1.7",
+    "playwright": "^1.48.2",
     "rimraf": "^6.0.1",
     "serve": "^14.2.3",
     "typescript": "^5.6.3"
