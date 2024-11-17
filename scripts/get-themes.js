@@ -74,8 +74,12 @@ async function main() {
   divider();
   await saveTheme(page, "Light+", "dist/themes/light.js");
   await saveTheme(page, "Light Modern", "dist/themes/light-v2.js");
+  await saveTheme(page, "Solarized Light", "dist/themes/light-solarized.js");
+  await saveTheme(page, "Quiet Light", "dist/themes/light-quiet.js");
   await saveTheme(page, "Dark+", "dist/themes/dark.js");
   await saveTheme(page, "Dark Modern", "dist/themes/dark-v2.js");
+  await saveTheme(page, "Monokai", "dist/themes/dark-monokai.js");
+  await saveTheme(page, "Solarized Dark", "dist/themes/dark-solarized.js");
   await saveTheme(page, "Dark High Contrast", "dist/themes/hc-dark.js");
   await saveTheme(page, "Light High Contrast", "dist/themes/hc-light.js");
   browser.close();

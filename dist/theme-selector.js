@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @typedef {"light" | "light-v2" | "dark" | "dark-v2" | "hc-light" | "hc-dark"} ThemeId
+ * @typedef {"light" | "light-v2" | "light-solarized" | "light-quiet" | "dark" | "dark-v2" | "dark-monokai" | "dark-solarized" | "hc-light" | "hc-dark"} ThemeId
  * @typedef {"vscode-light" | "vscode-dark" | "vscode-high-contrast" | "vscode-high-contrast-light"} ThemeKind
  *
  * @typedef  ThemeInfoItem
@@ -81,6 +81,16 @@ export class VscodeThemeSelector extends HTMLElement {
       name: "Light Modern",
       longName: "Default Light Modern",
     },
+    "light-quiet": {
+      themeKind: "vscode-light",
+      name: "Quiet Light",
+      longName: "Quiet Light",
+    },
+    "light-solarized": {
+      themeKind: "vscode-light",
+      name: "Solarized Light",
+      longName: "Solarized Light",
+    },
     dark: {
       themeKind: "vscode-dark",
       name: "Dark+",
@@ -90,6 +100,16 @@ export class VscodeThemeSelector extends HTMLElement {
       themeKind: "vscode-dark",
       name: "Dark Modern",
       longName: "Default Dark Modern",
+    },
+    "dark-solarized": {
+      themeKind: "vscode-dark",
+      name: "Solarized Dark",
+      longName: "Solarized Dark",
+    },
+    "dark-monokai": {
+      themeKind: "vscode-dark",
+      name: "Monokai",
+      longName: "Monokai",
     },
     "hc-light": {
       themeKind: "vscode-high-contrast-light",
@@ -110,8 +130,12 @@ export class VscodeThemeSelector extends HTMLElement {
   static themes = {
     light: {},
     "light-v2": {},
+    "light-quiet": {},
+    "light-solarized": {},
     dark: {},
     "dark-v2": {},
+    "dark-monokai": {},
+    "dark-solarized": {},
     "hc-light": {},
     "hc-dark": {},
   };
@@ -173,10 +197,18 @@ export class VscodeThemeSelector extends HTMLElement {
         return await import(`./themes/light.js`);
       case "light-v2":
         return await import(`./themes/light-v2.js`);
+      case "light-quiet":
+        return await import(`./themes/light-quiet.js`);
+      case "light-solarized":
+        return await import(`./themes/light-solarized.js`);
       case "dark":
         return await import(`./themes/dark.js`);
       case "dark-v2":
         return await import(`./themes/dark-v2.js`);
+      case "dark-monokai":
+        return await import(`./themes/dark-monokai.js`);
+      case "dark-solarized":
+        return await import(`./themes/dark-solarized.js`);
       case "hc-dark":
         return await import(`./themes/hc-dark.js`);
       case "hc-light":
