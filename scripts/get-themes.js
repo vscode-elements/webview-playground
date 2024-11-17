@@ -1,64 +1,86 @@
 import { chromium } from "playwright";
 import fs from "node:fs/promises";
 
-async function main() {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto("https://vscode.dev");
+const wait = (t) => new Promise((resolve, _reject) => setTimeout(resolve, t));
 
-  await page.getByLabel("Application Menu").click();
+const divider = () => {
+  console.log("".padEnd(80, " "));
+};
+
+async function getThemeDefinitionContent(page) {
+  await page.getByRole("menuitem", { name: "Application Menu" }).click();
   await page.getByLabel("Help").dispatchEvent("mouseover");
   await page.getByLabel("Welcome", { exact: true }).first().click();
   await page.locator(".getting-started-category.featured").click();
   const webviewIframe = page.locator("iframe.webview.ready");
   await webviewIframe.waitFor({ state: "attached" });
 
-  // const webview = page.locator("iframe.webview.ready");
   const activeFrame = webviewIframe.contentFrame().locator("#active-frame");
   const activeFrameDOM = activeFrame.contentFrame();
 
-  console.log(activeFrame.contentFrame());
-
   const res = await activeFrameDOM.locator("html").evaluate((html) => {
-    return Array.from(html.style).filter((s) => s.startsWith('--vscode'));
+    const mapper = (s) => {
+      const k = s.replace(/\./g, "\\.");
+      const v = document.documentElement.style.getPropertyValue(s);
+      return `  ["${k}", "${v}"],\n`;
+    };
+
+    const variables = Array.from(html.style)
+      .sort((a, b) => a.localeCompare(b))
+      .filter(
+        (s) =>
+          s.startsWith("--vscode") &&
+          s.indexOf("--vscode-font-family") === -1 &&
+          s.indexOf("--vscode-editor-font-family") === -1
+      )
+      .map(mapper)
+      .join("");
+
+    let js = "/** @type {[string, string][]} */\n";
+    js += `export const theme = [\n${variables}];\n`;
+    return js;
   });
 
-  // const res = await webview.contentFrame().evaluate(() => {
-  //   // const activeFrame = document.querySelector('#active-frame').contentDocument;
+  return res;
+}
 
-  //   const mapper = (s) => {
-  //     const k = s.replace(/\./g, "\\.");
-  //     const v = document.documentElement.style.getPropertyValue(s);
-  //     const p = `${s.replace(
-  //       /\./g,
-  //       "\\."
-  //     )}: ${document.documentElement.style.getPropertyValue(s)}`;
-  //     return `  ["${k}", "${v}"],\n`;
-  //   };
+async function changeTheme(page, theme) {
+  console.log("Select theme:", theme);
+  await page.goto("https://vscode.dev");
+  await page.locator(".action-item.command-center-center").focus();
+  await page.keyboard.press("Control+Shift+P");
+  await page.keyboard.type("Preferences: Color Theme", { delay: 100 });
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type(theme, { delay: 100 });
+  await page.keyboard.press("Enter");
+  await wait(1000);
 
-  //   const list = Array.from(document.documentElement.style)
-  //     .sort((a, b) => a.localeCompare(b))
-  //     .filter(
-  //       (v) =>
-  //         v.indexOf("--vscode-font-family") === -1 &&
-  //         v.indexOf("--vscode-editor-font-family") === -1 &&
-  //         v.indexOf("--text-link-decoration") === -1
-  //     )
-  //     .map(mapper)
-  //     .join("");
-  //   let js = "/** @type {[string, string][]} */\n";
-  //   js += `export const theme = [\n${list}];\n`;
+  console.log(theme, "applied");
+}
 
-  //   return document.documentElement.outerHTML;
-  // });
+async function saveTheme(page, theme, path) {
+  await changeTheme(page, theme);
+  const data = await getThemeDefinitionContent(page);
+  await fs.writeFile(path, data);
+  console.log(path, "saved");
+  divider();
+}
 
-  // console.log(res);
+async function main() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
 
-  // await page.screenshot({ path: "screenshot.png" });
-
-  console.log(res);
-
-  await fs.writeFile('result.txt', res.toString());
+  divider();
+  await saveTheme(page, "Light+", "dist/themes/light.js");
+  await saveTheme(page, "Light Modern", "dist/themes/light-v2.js");
+  await saveTheme(page, "Dark+", "dist/themes/dark.js");
+  await saveTheme(page, "Dark Modern", "dist/themes/dark-v2.js");
+  await saveTheme(page, "Dark High Contrast", "dist/themes/hc-dark.js");
+  await saveTheme(page, "Light High Contrast", "dist/themes/hc-light.js");
+  browser.close();
+  console.log("Done");
+  divider();
 }
 
 main();
