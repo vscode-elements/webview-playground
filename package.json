@@ -15,7 +15,8 @@
     "dev": "serve",
     "clean": "rimraf -g \"./dist/**/*.d.ts?(.map)\" && rimraf -g \"vscode-elements-webview-playground-*.tgz\"",
     "build": "npm run clean && tsc",
-    "get-themes:dev": "nodemon scripts/get-themes.js"
+    "get-themes:dev": "nodemon --ignore \"dist/themes/*.js\" scripts/get-themes.js",
+    "get-themes": "node scripts/get-themes.js"
   },
   "author": "Adam Bender <szoftverhiba@gmail.com>",
   "license": "MIT",
