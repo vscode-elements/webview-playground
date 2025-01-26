@@ -5,34 +5,37 @@
  */
 
 const html = String.raw;
+const css = String.raw;
 
 const STORAGE_KEY_VIEW_CONTAINER = "vscode-playground:view-container";
 
+const styles = new CSSStyleSheet();
+styles.replaceSync(css`
+  :host {
+    align-items: center;
+    display: flex;
+    font-family: var(--vscode-font-family, sans-serif);
+    font-size: 13px;
+  }
+
+  label {
+    margin-right: 5px;
+  }
+
+  select {
+    background-color: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-foreground);
+    color: var(--vscode-foreground);
+    font-family: var(--vscode-font-family, sans-serif);
+  }
+
+  select:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+  }
+`);
+
 function getComponentTemplate() {
   return html`
-    <style>
-      :host {
-        align-items: center;
-        display: flex;
-        font-family: var(--vscode-font-family, sans-serif);
-        font-size: 13px;
-      }
-
-      label {
-        margin-right: 5px;
-      }
-
-      select {
-        background-color: var(--vscode-editor-background);
-        border: 1px solid var(--vscode-foreground);
-        color: var(--vscode-foreground);
-        font-family: var(--vscode-font-family, sans-serif);
-      }
-
-      select:focus {
-        outline: 1px solid var(--vscode-focusBorder);
-      }
-    </style>
     <label for="container-selector">View container</label>
     <select id="container-selector">
       <option value="editor">Editor</option>
@@ -63,6 +66,7 @@ export class VscodeViewContainerSelector extends HTMLElement {
     }
 
     let shadowRoot = this.attachShadow({ mode: "open" });
+    shadowRoot.adoptedStyleSheets.push(styles);
     shadowRoot.appendChild(
       VscodeViewContainerSelector.template.content.cloneNode(true)
     );
