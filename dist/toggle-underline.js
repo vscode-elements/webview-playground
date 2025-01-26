@@ -1,28 +1,31 @@
 // @ts-check
 
 const html = String.raw;
+const css = String.raw;
 
 export const STORAGE_KEY_UNDERLINE = "vscode-playground:underline";
 
+const styles = new CSSStyleSheet();
+styles.replaceSync(css`
+  :host {
+    align-items: flex-start;
+    display: flex;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  input {
+    display: block;
+    margin: 3px 4px 0 0;
+  }
+
+  label {
+    user-select: none;
+  }
+`);
+
 function getComponentTemplate() {
   return html`
-    <style>
-      :host {
-        align-items: flex-start;
-        display: flex;
-        font-size: 13px;
-        white-space: nowrap;
-      }
-
-      input {
-        display: block;
-        margin: 3px 4px 0 0;
-      }
-
-      label {
-        user-select: none;
-      }
-    </style>
     <input type="checkbox" id="toggle-underline" part="checkbox">
     <label for="toggle-underline" part="label"
       >Accessibility: Underline Links</span></label
@@ -49,6 +52,7 @@ export class VscodeToggleUnderline extends HTMLElement {
     }
 
     let shadowRoot = this.attachShadow({ mode: "open" });
+    shadowRoot.adoptedStyleSheets.push(styles);
     shadowRoot.appendChild(
       VscodeToggleUnderline.template.content.cloneNode(true)
     );

@@ -1,28 +1,31 @@
 // @ts-check
 
 const html = String.raw;
+const css = String.raw;
 
 export const STORAGE_KEY_MOTION = "vscode-playground:reduce-motion";
 
+const styles = new CSSStyleSheet();
+styles.replaceSync(css`
+  :host {
+    align-items: flex-start;
+    display: flex;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  input {
+    display: block;
+    margin: 3px 4px 0 0;
+  }
+
+  label {
+    user-select: none;
+  }
+`);
+
 function getComponentTemplate() {
   return html`
-    <style>
-      :host {
-        align-items: flex-start;
-        display: flex;
-        font-size: 13px;
-        white-space: nowrap;
-      }
-
-      input {
-        display: block;
-        margin: 3px 4px 0 0;
-      }
-
-      label {
-        user-select: none;
-      }
-    </style>
     <input type="checkbox" id="toggle-motion" part="checkbox" />
     <label for="toggle-motion" part="label">Workbench: Reduce Motion</label>
   `;
@@ -47,6 +50,7 @@ export class VscodeToggleMotion extends HTMLElement {
     }
 
     let shadowRoot = this.attachShadow({ mode: "open" });
+    shadowRoot.adoptedStyleSheets.push(styles);
     shadowRoot.appendChild(VscodeToggleMotion.template.content.cloneNode(true));
 
     this.#checkbox = /** @type {HTMLInputElement} */ (
