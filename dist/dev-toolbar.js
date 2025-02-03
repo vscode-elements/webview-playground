@@ -3,130 +3,133 @@
 import { getDefaultStylesCSS } from "./shared.js";
 
 const html = String.raw;
+const css = String.raw;
 
 const DEFAULT_STYLES_ID = "_defaultStyles";
 const ATTR_HIDDEN = "hidden";
 const STORAGE_KEY_HIDE_UI = "vscode-playground:dev-toolbar-hidden";
+
+const styles = new CSSStyleSheet();
+styles.replaceSync(css`
+  :host {
+    bottom: 30px;
+    font-family: sans-serif;
+    font-size: 14px;
+    position: fixed;
+    right: 30px;
+    z-index: 1000;
+  }
+
+  .ui {
+    display: block;
+  }
+
+  .ui.hidden {
+    display: none;
+  }
+
+  label {
+    user-select: none;
+  }
+
+  .open-toolbar-button {
+    background-color: #fff;
+    border: 1px solid #cdcdcd;
+    border-radius: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: block;
+    height: 42px;
+    padding: 4px;
+    width: 42px;
+  }
+
+  .open-toolbar-button.open {
+    display: none;
+  }
+
+  .open-toolbar-button svg {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .close-toolbar-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: block;
+    padding: 4px;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+  }
+
+  .close-toolbar-button svg {
+    display: block;
+    height: 16px;
+    width: 16px;
+  }
+
+  .panel {
+    background-color: #fff;
+    border: 1px solid #cdcdcd;
+    border-radius: 12px;
+    color: #000;
+    display: none;
+    padding: 10px;
+    position: relative;
+  }
+
+  fieldset {
+    border: 1px solid #e7e7e7;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  vscode-toggle-underline::part(checkbox),
+  vscode-toggle-motion::part(checkbox) {
+    margin-top: 0;
+  }
+
+  .row {
+    align-items: center;
+    display: flex;
+    margin: 0 0 10px;
+  }
+
+  .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .row.select label {
+    text-align: right;
+    width: 80px;
+  }
+
+  .row.select select {
+    width: 150px;
+  }
+
+  select {
+    margin-left: 5px;
+  }
+
+  input[type="checkbox"] {
+    margin: 0 5px 0 0;
+  }
+
+  .panel.open {
+    display: block;
+  }
+`);
 
 /**
  * @returns {string}
  */
 function getComponentTemplate() {
   return html`
-    <style>
-      :host {
-        bottom: 30px;
-        font-family: sans-serif;
-        font-size: 14px;
-        position: fixed;
-        right: 30px;
-        z-index: 1000;
-      }
-
-      .ui {
-        display: block;
-      }
-
-      .ui.hidden {
-        display: none;
-      }
-
-      label {
-        user-select: none;
-      }
-
-      .open-toolbar-button {
-        background-color: #fff;
-        border: 1px solid #cdcdcd;
-        border-radius: 12px;
-        box-sizing: border-box;
-        cursor: pointer;
-        display: block;
-        height: 42px;
-        padding: 4px;
-        width: 42px;
-      }
-
-      .open-toolbar-button.open {
-        display: none;
-      }
-
-      .open-toolbar-button svg {
-        display: block;
-        height: 100%;
-        width: 100%;
-      }
-
-      .close-toolbar-button {
-        background-color: transparent;
-        border: none;
-        box-sizing: border-box;
-        cursor: pointer;
-        display: block;
-        padding: 4px;
-        position: absolute;
-        right: 3px;
-        top: 3px;
-      }
-
-      .close-toolbar-button svg {
-        display: block;
-        height: 16px;
-        width: 16px;
-      }
-
-      .panel {
-        background-color: #fff;
-        border: 1px solid #cdcdcd;
-        border-radius: 12px;
-        color: #000;
-        display: none;
-        padding: 10px;
-        position: relative;
-      }
-
-      fieldset {
-        border: 1px solid #e7e7e7;
-        border-radius: 5px;
-        padding: 10px;
-      }
-
-      vscode-toggle-underline::part(checkbox),
-      vscode-toggle-motion::part(checkbox) {
-        margin-top: 0;
-      }
-
-      .row {
-        align-items: center;
-        display: flex;
-        margin: 0 0 10px;
-      }
-
-      .row:last-child {
-        margin-bottom: 0;
-      }
-
-      .row.select label {
-        text-align: right;
-        width: 80px;
-      }
-
-      .row.select select {
-        width: 150px;
-      }
-
-      select {
-        margin-left: 5px;
-      }
-
-      input[type="checkbox"] {
-        margin: 0 5px 0 0;
-      }
-
-      .panel.open {
-        display: block;
-      }
-    </style>
     <div class="ui">
       <button type="button" title="Open toolbar" class="open-toolbar-button">
         <svg
@@ -210,6 +213,7 @@ export class VscodeDevToolbar extends HTMLElement {
 
     let shadowRoot = this.attachShadow({ mode: "open" });
     shadowRoot.appendChild(VscodeDevToolbar.template.content.cloneNode(true));
+    shadowRoot.adoptedStyleSheets.push(styles);
   }
 
   connectedCallback() {
@@ -291,6 +295,13 @@ export class VscodeDevToolbar extends HTMLElement {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("id", DEFAULT_STYLES_ID);
       styleElement.innerHTML = getDefaultStylesCSS();
+
+      // @ts-ignore
+      if (window?.vscodeWebviewPlaygroundNonce) {
+        // @ts-ignore
+        styleElement.setAttribute('nonce', window.vscodeWebviewPlaygroundNonce);
+      }
+
       document.head.appendChild(styleElement);
     }
   }
