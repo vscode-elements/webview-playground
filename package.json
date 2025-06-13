@@ -13,6 +13,10 @@
     "type": "git",
     "url": "git+https://github.com/vscode-elements/webview-playground.git"
   },
+  "bugs": {
+    "url": "https://github.com/vscode-elements/webview-playground/issues"
+  },
+  "homepage": "https://github.com/vscode-elements/webview-playground",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "serve",
