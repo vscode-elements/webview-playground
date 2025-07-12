@@ -21,7 +21,9 @@ async function getThemeDefinitionContent(page) {
   const res = await activeFrameDOM.locator("html").evaluate((html) => {
     const mapper = (s) => {
       const k = s.replace(/\./g, "\\.");
-      const v = document.documentElement.style.getPropertyValue(s);
+      const v = document.documentElement.style
+        .getPropertyValue(s)
+        .replaceAll('"', '\\"');
       return `  ["${k}", "${v}"],\n`;
     };
 
